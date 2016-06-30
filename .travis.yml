@@ -10,5 +10,5 @@ script:
   - mkdir build
   - cd build
   - qmake -qt=qt5 ../src/d2d.pro
-  - make debug release
+  - make
 
