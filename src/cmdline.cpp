@@ -29,7 +29,7 @@ CommandLine::CommandLine( const QString& aLayer, qreal aX0,qreal aY0,qreal aX1,q
 
 CommandLine* CommandLine::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "line" )
+    if( aData["command"].toString() != "line" )
         return NULL;
 
     QJsonValue vx0 = aData["x0"];

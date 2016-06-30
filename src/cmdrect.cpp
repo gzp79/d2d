@@ -31,7 +31,7 @@ CommandRect::CommandRect( const QString& aLayer, qreal aX0,qreal aY0,qreal aX1,q
 
 CommandRect* CommandRect::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "rect" )
+    if( aData["command"].toString() != "rect" )
         return NULL;
 
     QJsonValue vx0 = aData["x0"];

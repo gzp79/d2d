@@ -24,8 +24,6 @@ void QGraphicsPointText::addText( const QString& aText, const QColor& aCol )
 {
     mData.append( Data(aCol, aText) );
     this->setHtml( genHtml() );
-    qDebug() << toHtml();
-
     update();
 }
 

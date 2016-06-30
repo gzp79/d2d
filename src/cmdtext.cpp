@@ -27,7 +27,7 @@ CommandText::CommandText( const QString& aLayer, qreal aX,qreal aY, const QStrin
 
 CommandText* CommandText::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "text" )
+    if( aData["command"].toString() != "text" )
         return NULL;
 
     QJsonValue vx = aData["x"];

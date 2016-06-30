@@ -2,5 +2,7 @@
 *[#]*[#]
 *[#]*
 build
+build-d2d*
 tmp
-*.user
+d2d.pro.user
+

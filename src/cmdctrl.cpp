@@ -15,7 +15,7 @@ CommandReset::CommandReset()
 
 CommandReset* CommandReset::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "reset" )
+    if( aData["command"].toString() != "reset" )
         return NULL;
 
     return new CommandReset();
@@ -33,7 +33,7 @@ CommandClear::CommandClear()
 
 CommandClear* CommandClear::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "clear" )
+    if( aData["command"].toString() != "clear" )
         return NULL;
 
     return new CommandClear();
@@ -57,7 +57,7 @@ CommandCache::CommandCache( int aId )
 
 CommandCache* CommandCache::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "cache" )
+    if( aData["command"].toString() != "cache" )
         return NULL;
 
     bool ok = true;

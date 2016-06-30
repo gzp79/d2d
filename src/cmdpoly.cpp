@@ -29,7 +29,7 @@ CommandPoly::CommandPoly( const QString& aLayer, const QVector<qreal>& aX, const
 
 CommandPoly* CommandPoly::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "poly" )
+    if( aData["command"].toString() != "poly" )
         return NULL;
 
     QVector<qreal> x,y;

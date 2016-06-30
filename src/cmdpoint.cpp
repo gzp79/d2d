@@ -29,7 +29,7 @@ CommandPoint::CommandPoint( const QString& aLayer, qreal aX,qreal aY, quint32 aC
 
 CommandPoint* CommandPoint::parse( const QJsonObject& aData )
 {
-    if( aData["command"] != "point" )
+    if( aData["command"].toString() != "point" )
         return NULL;
 
     QJsonValue vx = aData["x"];
