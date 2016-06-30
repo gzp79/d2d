@@ -1,2 +1,5 @@
 # d2d
-2D Debugger to send and visualize 2d primitives
+A simple 2D Debugger to visualize 2d primitives.
+
+Programs can attach to the visualizer through multiple channels and send 2d primitives.
+
