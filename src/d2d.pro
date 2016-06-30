@@ -6,7 +6,7 @@ QT += network
 CONFIG += console
 
 HEADERS += \
-        graphwidget.h \
+    graphwidget.h \
     mainwindow.h \
     inputtcp.h \
     scenemanager.h \
@@ -20,8 +20,8 @@ HEADERS += \
     cmdpoly.h
 
 SOURCES += \
-        main.cpp \
-        graphwidget.cpp \
+    main.cpp \
+    graphwidget.cpp \
     mainwindow.cpp \
     inputtcp.cpp \
     scenemanager.cpp \
