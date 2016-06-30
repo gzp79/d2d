@@ -1,10 +1,12 @@
 language: cpp
 
-install:
-  - sudo apt-get update
-  - sudo apt-get install libqt5-dev qt5-qmake
-
+before_install:
+    - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
+	
 script:
-  - qmake -project
-  - qmake hello.pro
-  - make
+    - qmake -qt=qt5 -v
+    - qmake -qt=qt5
+    - make
+	
