@@ -68,13 +68,13 @@ All primitives have some common, optional properties:
  ```json
  { "command":"poly",
    "color": color,
-   "layer": layer
+   "layer": layer,
    "x": coords_x,
    "y": coords_y }
  ```
  Adds a (filled) polygon. The x(y) coordinates of the contour vertices of the polygon are given in the __coords_x__ (__coords_y__) array. The size of x,y shall be identical and shall contain at least 3 vertex.
  
- #### Text
+#### Text
  ```json
  { "command":"text",
    "color": color,
@@ -83,7 +83,7 @@ All primitives have some common, optional properties:
    "y": coord_tl_y,
    "text": text }
  ```
- Adds a text to the (__coord_tl_x__,__coord_tl_y__) position. A point (a small disk) marks the location and the __text__ text is placed to the right. When multiple texts are placed to the same location they are not drawn, but written one over the other aligned to the given position.
+ Adds a text to the (__coord_tl_x__,__coord_tl_y__) position. A point (a small disk) marks the location and the __text__ text is placed to the right. When multiple texts are placed to the same location they are not drawn over each other, but written one under the other aligned to the given position.
  
 ## Channels
 
