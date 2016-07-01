@@ -24,42 +24,47 @@ Commands are provided as a JSon message usually
    "id": register }
  ```
  Store the current scene in the __register__ register. Registers are stored as persistent files in the user folder.
+
 ### Primitives
 All primitives have some common, optional properties:
 - color - argb components given as a large (32bit) hexadecimal value. White is assumed if not given
-- layer - string identifying the layer. "default" is assumed if not given 
+- layer - string identifying the layer. "default" is assumed if not given
+
 #### Point
  ```json
  { "command":"point",
    "color": color,
-   "layer": layer
+   "layer": layer,
    "x": coord_x,
    "y": coord_y }
  ```
  Adds a point (a small disc) going at (__coord_x__,__coord_y__) with __color__ color to the __layer__ layer.
+
 #### Line
  ```json
  { "command":"line",
    "color": color,
-   "layer": layer
+   "layer": layer,
    "x0": coord_start_x,
    "y0": coord_start_y,
    "x1": coord_end_x,
    "y1": coord_end_y }
  ```
  Adds a line going from (__coord_start_x__,__coord_start_y__) to (__coord_end_x__,__coord_end_y__) with __color__ color to the __layer__ layer.
- #### Rectangle
+ 
+#### Rectangle
  ```json
  { "command":"rect",
    "color": color,
-   "layer": layer
+   "layer": layer,
    "x0": coord_tl_x,
    "y0": coord_tl_y,
    "x1": coord_br_x,
    "y1": coord_br_y }
  ```
  Adds a (non-filled) rectangle connecting the two diagonal vertex  (__coord_tl_x__,__coord_tl_y__), (__coord_br_x__,__coord_br_y__) with __color__ color to the __layer__ layer.
-  #### Polygon
+ 
+#### Polygon
  ```json
  { "command":"poly",
    "color": color,
@@ -68,11 +73,12 @@ All primitives have some common, optional properties:
    "y": coords_y }
  ```
  Adds a (filled) polygon. The x(y) coordinates of the contour vertices of the polygon are given in the __coords_x__ (__coords_y__) array. The size of x,y shall be identical and shall contain at least 3 vertex.
+ 
  #### Text
  ```json
  { "command":"text",
    "color": color,
-   "layer": layer
+   "layer": layer,
    "x": coord_tl_x,
    "y": coord_tl_y,
    "text": text }
@@ -80,6 +86,7 @@ All primitives have some common, optional properties:
  Adds a text to the (__coord_tl_x__,__coord_tl_y__) position. A point (a small disk) marks the location and the __text__ text is placed to the right. When multiple texts are placed to the same location they are not drawn, but written one over the other aligned to the given position.
  
 ## Channels
+
 ### Tcp channels
 D2D is also a tcp server. Multiple program may send data the server. Each packet is parsed as a string and may contain any number of json messages and thus a packet is not a well-formed JSon message. There is no requirement to enclose the whole string (actually it is not supported) in a top-level block. It is enough to concatenate the commands into a large packet and send it at once. (Or one may send the commands one-by-one).
 
