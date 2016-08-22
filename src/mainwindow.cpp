@@ -243,3 +243,14 @@ void MainWindow::on_btnTest_clicked()
 
     mSceneManager->addCommand( QByteArray( "{ \"command\":\"cache\", \"id\":\"1\" }") );
 }
+
+void MainWindow::on_btnScreenCapture_clicked()
+{
+    mLastSelectedScreenFile = QFileDialog::getSaveFileName( this, QString( "Select image file" ), mLastSelectedScreenFile, QString("Images(*.jpg *.png *.xpm)"));
+    if( !mLastSelectedScreenFile.isEmpty() )
+    {
+        QRect rect = ui->graphView->geometry();
+        QPixmap pixMap = ui->graphView->grab( QRect( 0,0, rect.width(), rect.height() ) );
+        pixMap.save(mLastSelectedScreenFile);
+    }
+}

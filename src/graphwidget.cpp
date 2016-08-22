@@ -32,8 +32,8 @@ GraphWidget::GraphWidget(QWidget* aParent)
     setDragMode(ScrollHandDrag);
     setTransformationAnchor(AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);    
-    verticalScrollBar()->hide();
-    horizontalScrollBar()->hide();
+    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
 
     mTimer = new QTimer(this);
     mTimer->setInterval(100);

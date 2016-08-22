@@ -48,6 +48,8 @@ private slots:
     void handleLayersChanged();
     void handleLayersVisibilityChanged(LayerInfo);
 
+    void on_btnScreenCapture_clicked();
+
 private:
     enum {
         DataLayerKey    = Qt::UserRole + 1,
@@ -58,6 +60,7 @@ private:
     SceneManager*   mSceneManager;
     bool            mInHandleLayersVisibilityChanged;
     QString         mLastSelectedFile;
+    QString         mLastSelectedScreenFile;
 };
 
 #endif // MAINWINDOW_H
