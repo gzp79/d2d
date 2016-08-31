@@ -73,6 +73,16 @@ All primitives have some common, optional properties:
    "y": coords_y }
  ```
  Adds a (filled) polygon. The x(y) coordinates of the contour vertices of the polygon are given in the __coords_x__ (__coords_y__) array. The size of x,y shall be identical and shall contain at least 3 vertex.
+
+#### Poly-line
+ ```json
+ { "command":"polyline",
+   "color": color,
+   "layer": layer,
+   "x": coords_x,
+   "y": coords_y }
+ ```
+ Adds a line strip. The x(y) coordinates of the vertices of the line lisr are given in the __coords_x__ (__coords_y__) array. The size of x,y shall be identical and shall contain at least 3 vertex.
  
 #### Text
  ```json
