@@ -1,8 +1,8 @@
 // Copyright (c) 2005-2016 Gzp
 // Distributed under MIT License.
 
-#ifndef CMDCLEAR_H
-#define CMDCLEAR_H
+#ifndef CMDCTRL_H
+#define CMDCTRL_H
 
 #include "scenemanager.h"
 #include <QJsonDocument>
@@ -53,5 +53,5 @@ protected:
 };
 
 
-#endif // CMDCLEAR_H
+#endif // CMDCTRL_H
 

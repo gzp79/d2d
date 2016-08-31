@@ -45,11 +45,13 @@ signals:
     void onHighQualityChanged( bool aEnable );
 
 protected:
-    void keyPressEvent(QKeyEvent* aEvent) Q_DECL_OVERRIDE;
+    void keyPressEvent( QKeyEvent* aEvent ) Q_DECL_OVERRIDE;
 #ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QWheelEvent* aEvent) Q_DECL_OVERRIDE;
+    void wheelEvent( QWheelEvent* aEvent ) Q_DECL_OVERRIDE;
 #endif    
-    void mousePressEvent(QMouseEvent* aEvent) Q_DECL_OVERRIDE;
+    void enterEvent( QEvent* aEvent ) Q_DECL_OVERRIDE;
+    void mousePressEvent( QMouseEvent* aEvent ) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent( QMouseEvent* aEvent ) Q_DECL_OVERRIDE;
     void drawBackground( QPainter* aPainter, const QRectF& aRect ) Q_DECL_OVERRIDE;
 
 

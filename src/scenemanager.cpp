@@ -30,6 +30,7 @@
 #include "cmdtext.h"
 #include "cmdpoint.h"
 #include "cmdpoly.h"
+#include "cmdpolyline.h"
 
 
 template <> inline bool qMapLessThanKey(const QPointF& key1, const QPointF& key2)
@@ -150,8 +151,11 @@ bool SceneManager::LayerData::initParts( QGraphicsScene* aScene )
     {
         if( parts[i] == NULL )
         {
-            parts[i] = new QGraphicsItemGroup();
-            aScene->addItem( parts[i] );
+            QGraphicsItemGroup* part = new QGraphicsItemGroup();
+            //part->setFlag(QGraphicsItem::ItemIsSelectable, true);
+            part->setData(DataLayerKey, QString("$layer"));
+            aScene->addItem( part );
+            parts[i] = part;
             changed = true;
         }
     }
@@ -225,15 +229,16 @@ void SceneManager::addCommand( const QString& aData )
         }
 
         Command* cmd = NULL;
-        if( (cmd = CommandClear::parse(jdoc.object())) != NULL )      addCommand(cmd);
-        else if( (cmd = CommandReset::parse(jdoc.object())) != NULL ) addCommand(cmd);
-        else if( (cmd = CommandCache::parse(jdoc.object())) != NULL ) addCommand(cmd);
-        else if( (cmd = CommandLine::parse(jdoc.object())) != NULL )  addCommand(cmd);
-        else if( (cmd = CommandRect::parse(jdoc.object())) != NULL )  addCommand(cmd);
-        else if( (cmd = CommandText::parse(jdoc.object())) != NULL )  addCommand(cmd);
-        else if( (cmd = CommandPoint::parse(jdoc.object())) != NULL ) addCommand(cmd);
-        else if( (cmd = CommandPoly::parse(jdoc.object())) != NULL )  addCommand(cmd);
-        else                                                          qDebug() << "invalid command: " << aData;
+        if( (cmd = CommandClear::parse(jdoc.object())) != NULL )            addCommand(cmd);
+        else if( (cmd = CommandReset::parse(jdoc.object())) != NULL )       addCommand(cmd);
+        else if( (cmd = CommandCache::parse(jdoc.object())) != NULL )       addCommand(cmd);
+        else if( (cmd = CommandLine::parse(jdoc.object())) != NULL )        addCommand(cmd);
+        else if( (cmd = CommandRect::parse(jdoc.object())) != NULL )        addCommand(cmd);
+        else if( (cmd = CommandText::parse(jdoc.object())) != NULL )        addCommand(cmd);
+        else if( (cmd = CommandPoint::parse(jdoc.object())) != NULL )       addCommand(cmd);
+        else if( (cmd = CommandPoly::parse(jdoc.object())) != NULL )        addCommand(cmd);
+        else if( (cmd = CommandPolyLine::parse(jdoc.object())) != NULL )    addCommand(cmd);
+        else                                                                qDebug() << "invalid command: " << aData;
 
         tryCount = 0;
         start = end + 1;
@@ -353,11 +358,12 @@ void SceneManager::save( const QString& aFile ) const
 
         switch( cmdType )
         {
-            case CommandLine::Type:   CommandLine::save( strm, item ); break;
-            case CommandRect::Type:   CommandRect::save( strm, item ); break;
-            case CommandText::Type:   CommandText::save( strm, item ); break;
-            case CommandPoint::Type:  CommandPoint::save( strm, item ); break;
-            case CommandPoly::Type:   CommandPoly::save( strm, item ); break;
+            case CommandLine::Type:     CommandLine::save( strm, item ); break;
+            case CommandRect::Type:     CommandRect::save( strm, item ); break;
+            case CommandText::Type:     CommandText::save( strm, item ); break;
+            case CommandPoint::Type:    CommandPoint::save( strm, item ); break;
+            case CommandPoly::Type:     CommandPoly::save( strm, item ); break;
+            case CommandPolyLine::Type: CommandPolyLine::save( strm, item ); break;
             default:
                 qDebug() << "no serializer for " << type;
         }
@@ -405,6 +411,12 @@ QRectF SceneManager::itemsBoundingRect()
 
 void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerPart aPart )
 {
+    Q_ASSERT( aLayer != "$layer" );
+    if( aLayer == "$layer" ) {
+        delete aItem;
+        return;
+    }
+
     QVariant r = aItem->data( DataBound );
     if( r.type() == QVariant::RectF )
     {
@@ -486,6 +498,24 @@ QGraphicsPointText* SceneManager::getTextAt( const QString& aLayer, QPointF aPnt
     if( it == layer->textMap.end() )
         return NULL;
     return it.value();
+}
+
+void SceneManager::setSelectedAt( const QPointF& aPos )
+{
+  QList<QGraphicsItem*> newSelection = items( aPos );
+  QList<QGraphicsItem*> selection = selectedItems();
+  for( QList<QGraphicsItem*>::iterator it = selection.begin(); it != selection.end(); ++it )
+  {
+      if( !newSelection.contains(*it) )
+          (*it)->setSelected( false );
+  }
+
+  for( QList<QGraphicsItem*>::iterator it = newSelection.begin(); it != newSelection.end(); ++it )
+  {
+      QGraphicsItem* item = *it;
+      if( item->data(DataLayerKey).toString() != "$layer" )
+            (*it)->setSelected( true );
+  }
 }
 
 void SceneManager::takeCommands()

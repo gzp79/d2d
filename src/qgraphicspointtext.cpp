@@ -36,6 +36,12 @@ void QGraphicsPointText::paint(QPainter* aPainter, const QStyleOptionGraphicsIte
     aPainter->setBrush( col );
     aPainter->setPen( col );
     aPainter->drawEllipse( QRectF(-1.5, -1.5, 3, 3) );
+
+    if( isSelected() )
+    {
+        aPainter->setBrush( QBrush() );
+        aPainter->drawEllipse( QRectF(-5, -5, 10, 10) );
+    }
 }
 
 QString QGraphicsPointText::genHtml() const

@@ -45,14 +45,15 @@ class SceneManager : public QGraphicsScene {
 public:
     enum {
         CmdInvalid,
-        CmdReset,  // don't wait for the other commands, drop everything immediatelly and clear queues
-        CmdClear,  // add command to the que and clear when it is processed
-        CmdCache,  // save scene into a register
-        CmdLine,   // add a line
-        CmdRect,   // add a rect
-        CmdText,   // add a text
-        CmdPoint,  // add a point
-        CmdPoly,   // add a polygon
+        CmdReset,       // don't wait for the other commands, drop everything immediatelly and clear queues
+        CmdClear,       // add command to the que and clear when it is processed
+        CmdCache,       // save scene into a register
+        CmdLine,        // add a line
+        CmdRect,        // add a rect
+        CmdText,        // add a text
+        CmdPoint,       // add a point
+        CmdPoly,        // add a polygon
+        CmdPolyLine,    // add a polyline
 
         CmdCount,
     };
@@ -115,6 +116,7 @@ public:
     void            setLayerVisibility( const QString& aName, ELayerPart aPart, bool aVisible );
 
     QGraphicsPointText* getTextAt( const QString& aLayer, QPointF aPnt );
+    void                setSelectedAt( const QPointF& aPos );
 
 signals:
     void onAreaPolicyChanged( int aValue );

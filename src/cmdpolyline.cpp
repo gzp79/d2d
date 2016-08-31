@@ -1,24 +1,25 @@
 // Copyright (c) 2005-2016 Gzp
 // Distributed under MIT License.
 
-#include "cmdpoly.h"
+#include "cmdpolyline.h"
 
 #include <QJsonArray>
 #include <QDebug>
 #include <QPen>
 #include <QBrush>
-#include <QGraphicsPolygonItem>
+#include <QGraphicsPathItem>
 #include <QPolygonF>
+#include <QPainterPath>
 #include <QGraphicsScene>
 #include <QJsonObject>
 #include <QJsonValue>
 
-CommandPoly::CommandPoly()
+CommandPolyLine::CommandPolyLine()
     : SceneManager::Command( Type )
 {
 }
 
-CommandPoly::CommandPoly( const QString& aLayer, const QVector<qreal>& aX, const QVector<qreal>& aY, quint32 aCol )
+CommandPolyLine::CommandPolyLine( const QString& aLayer, const QVector<qreal>& aX, const QVector<qreal>& aY, quint32 aCol )
     : SceneManager::Command( Type )
     , layer( aLayer )
     , x( aX )
@@ -27,83 +28,83 @@ CommandPoly::CommandPoly( const QString& aLayer, const QVector<qreal>& aX, const
 {
 }
 
-CommandPoly* CommandPoly::parse( const QJsonObject& aData )
+CommandPolyLine* CommandPolyLine::parse( const QJsonObject& aData )
 {
-    if( aData["command"].toString() != "poly" )
+    if( aData["command"].toString() != "polyline" )
         return NULL;
 
     QVector<qreal> x,y;
     QJsonValue vx = aData["x"];
-    if( !vx.isArray() ) { qDebug() << "error in poly command, invalid x parameter: " << vx.toString(); return NULL; }
+    if( !vx.isArray() ) { qDebug() << "error in polyline command, invalid x parameter: " << vx.toString(); return NULL; }
     QJsonArray vxa = vx.toArray();
-    if( vxa.size() < 3 ) { qDebug() << "error in poly command, x parameter count is too low at least 3 is required: " << vxa.size(); return NULL; }
+    if( vxa.size() < 3 ) { qDebug() << "error in polyline command, x parameter count is too low at least 3 is required: " << vxa.size(); return NULL; }
     x.resize( vxa.size() );
     for( int i = 0; i < vxa.size(); ++i )
     {
         QJsonValue v = vxa[i];
-        if( !v.isDouble() ) { qDebug() << "error in poly command, invalid x parameter value at " << i << ": " << v.toString(); return NULL; }
+        if( !v.isDouble() ) { qDebug() << "error in polyline command, invalid x parameter value at " << i << ": " << v.toString(); return NULL; }
         x[i] = v.toDouble();
     }
 
     QJsonValue vy = aData["y"];
-    if( !vy.isArray() ) { qDebug() << "error in poly command, invalid y parameter: " << vy.toString(); return NULL; }
+    if( !vy.isArray() ) { qDebug() << "error in polyline command, invalid y parameter: " << vy.toString(); return NULL; }
     QJsonArray vya = vy.toArray();
-    if( vya.size() != x.size() ) { qDebug() << "error in poly command, x,y parameter count mismatch: " << x.size() << "," << vya.size(); return NULL; }
+    if( vya.size() != x.size() ) { qDebug() << "error in polyline command, x,y parameter count mismatch: " << x.size() << "," << vya.size(); return NULL; }
     y.resize( vya.size() );
     for( int i = 0; i < vya.size(); ++i )
     {
         QJsonValue v = vya[i];
-        if( !v.isDouble() ) { qDebug() << "error in poly command, invalid y parameter value at " << i << ": " << v.toString(); return NULL; }
+        if( !v.isDouble() ) { qDebug() << "error in polyline command, invalid y parameter value at " << i << ": " << v.toString(); return NULL; }
         y[i] = v.toDouble();
     }
 
     bool ok = true;
     QJsonValue vcol = aData["color"];
     quint32 col = toCol32( vcol, &ok );
-    if( !ok ) { qDebug() << "error in poly command, invalid color parameter: " << vcol.toString(); return NULL; }
+    if( !ok ) { qDebug() << "error in polyline command, invalid color parameter: " << vcol.toString(); return NULL; }
 
-    //qDebug() << "poly (" << x.size() << "):";
-    //for( int i = 0; i < x.size(); ++i )
-    //{
-    //    qDebug() << x[i] << "," << y[i];
-    //}
+    qDebug() << "polyline (" << x.size() << "):";
+    for( int i = 0; i < x.size(); ++i )
+    {
+        qDebug() << x[i] << "," << y[i];
+    }
 
     QString layer = toLayer( aData["layer"] );
-    return new CommandPoly(layer, x, y, col);
+    return new CommandPolyLine(layer, x, y, col);
 }
 
-void CommandPoly::save( QTextStream& aStrm, const QGraphicsItem* aItem )
+void CommandPolyLine::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 {
-    const QGraphicsPolygonItem* poly = qgraphicsitem_cast<const QGraphicsPolygonItem*>(aItem);
+    const QGraphicsPathItem* poly = qgraphicsitem_cast<const QGraphicsPathItem*>(aItem);
     Q_ASSERT( poly != NULL );
     if( !poly )
         return;
 
-    QPolygonF pgon = poly->polygon();
+    QPainterPath path = poly->path();
     QColor col = poly->pen().color();
 
     QByteArray cmd;
 
     {
         QTextStream ts(&cmd);
-        ts << "{\"command\":\"poly\","
+        ts << "{\"command\":\"polyline\","
            << "\"layer\":\"" << toLayer(aItem) << "\",";
 
         ts << "\"x\":[";
-        for( int i = 0; i < pgon.size(); ++i )
+        for( int i = 0; i < path.elementCount(); ++i )
         {
             if( i != 0 )
                 ts << ",";
-            ts << pgon[i].x();
+            ts << path.elementAt(i).x;
         }
         ts << "],";
 
         ts << "\"y\":[";
-        for( int i = 0; i < pgon.size(); ++i )
+        for( int i = 0; i < path.elementCount(); ++i )
         {
             if( i != 0 )
                 ts << ",";
-            ts << -pgon[i].y();
+            ts << -path.elementAt(i).y;
         }
         ts << "],";
 
@@ -113,10 +114,11 @@ void CommandPoly::save( QTextStream& aStrm, const QGraphicsItem* aItem )
         ts.flush();
     }
 
+    qDebug() << cmd;
     aStrm << cmd;
 }
 
-void CommandPoly::execute( SceneManager& aScene )
+void CommandPolyLine::execute( SceneManager& aScene )
 {        
     QVector<QPointF> pnts;
     pnts.resize(x.size());
@@ -145,8 +147,10 @@ void CommandPoly::execute( SceneManager& aScene )
         pnts[i] = QPointF(x[i],-y[i]);
     }
 
+    QPainterPath path;
     QPolygonF pgon( pnts );
-    QGraphicsPolygonItem* item = new QGraphicsPolygonItem( pgon );
+    path.addPolygon( pgon );
+    QGraphicsPathItem* item = new QGraphicsPathItem( path );
     item->setData( SceneManager::DataTypeKey, QVariant(Type) );
     item->setData( SceneManager::DataBound, QVariant( QRectF(QPointF(minx,-miny),QPointF(maxx,-maxy)) ));
     item->setFlag( QGraphicsItem::ItemIsSelectable, true );
@@ -154,13 +158,8 @@ void CommandPoly::execute( SceneManager& aScene )
     QPen pen;
     QColor color = toQColor( col );
     pen.setColor( color );
-    //pen.setCosmetic( false );
     pen.setWidth(0);
-    item->setPen( pen );
-
-    QBrush brush( Qt::SolidPattern );
-    brush.setColor( color );
-    item->setBrush( brush );
+    item->setPen( pen );    
 
     aScene.addItem( item, layer, LayerPartGraph );
 }

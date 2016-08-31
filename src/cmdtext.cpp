@@ -57,9 +57,10 @@ void CommandText::save( QTextStream& aStrm, const QGraphicsItem* aItem )
     const QGraphicsPointText::DataVector& data = text->getData();
 
     QByteArray cmd;
+    QTextStream ts(&cmd);
     for( QGraphicsPointText::DataVector::const_iterator it = data.begin(); it != data.end(); ++it )
     {
-        QTextStream(&cmd) << "{ \"command\":\"text\","
+        ts << "{\"command\":\"text\","
             << "\"layer\":\"" << toLayer(aItem) << "\","
             << "\"x\":" << text->x() << ","
             << "\"y\":" << -text->y() << ","
@@ -67,6 +68,7 @@ void CommandText::save( QTextStream& aStrm, const QGraphicsItem* aItem )
             << "\"color\":" << toCol32( it->color )
             << "}\n";
     }
+    ts.flush();
     aStrm << cmd;
 }
 
@@ -74,8 +76,7 @@ void CommandText::execute( SceneManager& aScene )
 {
     QGraphicsPointText* item = aScene.getTextAt( layer, QPointF(x,-y) );
     if( item )
-    {
-        //todo: handle color change
+    {        
         item->addText( text, toQColor(col) );
         return;
     }
@@ -83,6 +84,7 @@ void CommandText::execute( SceneManager& aScene )
     item = new QGraphicsPointText( text, toQColor( col ) );
     item->setData( SceneManager::DataTypeKey, QVariant(Type) );
     item->setData( SceneManager::DataBound, QVariant( QPointF(x,-y) ));
+    item->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
     item->setPos( x,-y );    
     item->setZValue( 1 );

@@ -70,7 +70,7 @@ void CommandLine::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 
 
     QByteArray cmd;
-    QTextStream(&cmd) << "{ \"command\":\"line\","
+    QTextStream(&cmd) << "{\"command\":\"line\","
         << "\"layer\":\"" << toLayer(aItem) << "\","
         << "\"x0\":" << a.x() << ","
         << "\"y0\":" << -a.y() << ","
@@ -87,6 +87,7 @@ void CommandLine::execute( SceneManager& aScene )
 
     item->setData( SceneManager::DataTypeKey, QVariant(Type) );
     item->setData( SceneManager::DataBound, QVariant( QRectF(QPointF(x0,-y0),QPointF(x1,-y1)) ));
+    item->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
     QPen pen;
     pen.setColor( toQColor( col ) );

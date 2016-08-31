@@ -28,5 +28,5 @@ protected:
 };
 
 
-#endif // CMDRECT_H
+#endif // CMDPOLY_H
 

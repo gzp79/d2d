@@ -31,5 +31,5 @@ protected:
 };
 
 
-#endif // CMDTEXT_H
+#endif // CMDPOINT_H
 

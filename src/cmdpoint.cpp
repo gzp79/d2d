@@ -59,7 +59,7 @@ void CommandPoint::save( QTextStream& aStrm, const QGraphicsItem* aItem )
     QColor col = ellipse->brush().color();
 
     QByteArray cmd;
-    QTextStream(&cmd) << "{ \"command\":\"point\","
+    QTextStream(&cmd) << "{\"command\":\"point\","
         << "\"layer\":\"" << toLayer(aItem) << "\","
         << "\"x\":" << ellipse->x() << ","
         << "\"y\":" << -ellipse->y() << ","
@@ -73,6 +73,7 @@ void CommandPoint::execute( SceneManager& aScene )
     QGraphicsEllipseItem* item = new QGraphicsEllipseItem( -1.5, -1.5, 3,3 );
     item->setData( SceneManager::DataTypeKey, QVariant( Type ) );
     item->setData( SceneManager::DataBound, QVariant( QPointF(x,-y) ));
+    item->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
     item->setPos(x,-y);
     item->setFlag(QGraphicsItem::ItemIgnoresTransformations);

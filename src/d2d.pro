@@ -17,7 +17,8 @@ HEADERS += \
     cmdpoint.h \
     qgraphicspointtext.h \
     cmdctrl.h \
-    cmdpoly.h
+    cmdpoly.h \
+    cmdpolyline.h
 
 SOURCES += \
     main.cpp \
@@ -32,7 +33,10 @@ SOURCES += \
     cmdpoint.cpp \
     qgraphicspointtext.cpp \
     cmdctrl.cpp \
-    cmdpoly.cpp
+    cmdpoly.cpp \
+    cmdpolyline.cpp
+
+
 
 FORMS += \
     mainwindow.ui

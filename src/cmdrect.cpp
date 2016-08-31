@@ -70,8 +70,8 @@ void CommandRect::save( QTextStream& aStrm, const QGraphicsItem* aItem )
     QPointF br = rect->rect().bottomRight();
     QColor col = rect->pen().color();
 
-    QByteArray cmd;
-    QTextStream(&cmd) << "{ \"command\":\"rect\","
+    QByteArray cmd;    
+    QTextStream(&cmd) << "{\"command\":\"rect\","
         << "\"layer\":\"" << toLayer(aItem) << "\","
         << "\"x0\":" << tl.x() << ","
         << "\"y0\":" << -tl.y() << ","
@@ -92,6 +92,7 @@ void CommandRect::execute( SceneManager& aScene )
     QGraphicsRectItem* item = new QGraphicsRectItem( x,-y,w,-h );
     item->setData( SceneManager::DataTypeKey, QVariant(Type) );
     item->setData( SceneManager::DataBound, QVariant( QRectF(QPointF(x0,-y0),QPointF(x1,-y1)) ));
+    item->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
     QPen pen;
     QColor color = toQColor( col );

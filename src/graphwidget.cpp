@@ -22,6 +22,7 @@ GraphWidget::GraphWidget(QWidget* aParent)
     , mAutoFit( false )
     , mHighQuality( false )
 {
+    setInteractive(true);
     setCacheMode(CacheBackground);
     //setViewportUpdateMode(BoundingRectViewportUpdate);
     setViewportUpdateMode(FullViewportUpdate);
@@ -33,7 +34,7 @@ GraphWidget::GraphWidget(QWidget* aParent)
     setTransformationAnchor(AnchorUnderMouse);
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);    
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );    
 
     mTimer = new QTimer(this);
     mTimer->setInterval(100);
@@ -78,15 +79,32 @@ void GraphWidget::keyPressEvent( QKeyEvent* aEvent )
     QGraphicsView::keyPressEvent(aEvent);
 }
 
+void GraphWidget::enterEvent( QEvent* aEvent )
+{
+    QGraphicsView::enterEvent( aEvent );
+    viewport()->setCursor( Qt::ArrowCursor );
+}
+
 void GraphWidget::mousePressEvent( QMouseEvent* aEvent )
 {
-    // the same condition as in QGraphicsView as there is no reliable signal for ScrollHadDrag start/stop
+    // the same condition as in QGraphicsView as there is no reliable signal for ScrollHandDrag start/stop
     if( dragMode() == QGraphicsView::ScrollHandDrag && aEvent->button() == Qt::LeftButton )
     {
         setAutoFit( false );
     }
+    else if( aEvent->button() == Qt::RightButton )
+    {
+        mSceneManager->setSelectedAt(mapToScene(aEvent->pos()));
+    }
 
     QGraphicsView::mousePressEvent( aEvent );
+    viewport()->setCursor(Qt::ArrowCursor);
+}
+
+void GraphWidget::mouseReleaseEvent( QMouseEvent* aEvent )
+{
+    QGraphicsView::mouseReleaseEvent( aEvent );
+    viewport()->setCursor( Qt::ArrowCursor );
 }
 
 #ifndef QT_NO_WHEELEVENT

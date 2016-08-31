@@ -239,7 +239,16 @@ void MainWindow::on_btnTest_clicked()
     mSceneManager->addCommand( QByteArray( "{ \"command\":\"line\", \"layer\":\"layer1\", \"x0\": 90, \"y0\":-45, \"x1\":-90, \"y1\":-45, \"color\":\"0xff00ff00\" }") );
     mSceneManager->addCommand( QByteArray( "{ \"command\":\"rect\", \"x0\": 90, \"y0\":-45, \"x1\":-90, \"y1\": 45, \"color\":\"0x7f1f2f3f\" }") );
 
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"polyline\", \"x\": [20,90,20,90], \"y\": [20,20,90,90], \"color\":\"0xfff66f00\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":20, \"y\":20, \"text\":\"pl0\", \"color\":\"0xfff66f00\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":20, \"text\":\"pl1\", \"color\":\"0xfff66f00\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":20, \"y\":90, \"text\":\"pl2\", \"color\":\"0xfff66f00\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":90, \"text\":\"pl3\", \"color\":\"0xfff66f00\" }") );
+
     mSceneManager->addCommand( QByteArray( "{ \"command\":\"poly\", \"x\": [0,90,90], \"y\": [0,0,20], \"color\":\"0x7f1f2f3f\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":0, \"y\":0, \"text\":\"p0\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":0, \"text\":\"p1\" }") );
+    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":20, \"text\":\"p2\" }") );
 
     mSceneManager->addCommand( QByteArray( "{ \"command\":\"cache\", \"id\":\"1\" }") );
 }
