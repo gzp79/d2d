@@ -63,11 +63,11 @@ CommandPolyLine* CommandPolyLine::parse( const QJsonObject& aData )
     quint32 col = toCol32( vcol, &ok );
     if( !ok ) { qDebug() << "error in polyline command, invalid color parameter: " << vcol.toString(); return NULL; }
 
-    qDebug() << "polyline (" << x.size() << "):";
-    for( int i = 0; i < x.size(); ++i )
-    {
-        qDebug() << x[i] << "," << y[i];
-    }
+    //qDebug() << "polyline (" << x.size() << "):";
+    //for( int i = 0; i < x.size(); ++i )
+    //{
+    //    qDebug() << x[i] << "," << y[i];
+    //}
 
     QString layer = toLayer( aData["layer"] );
     return new CommandPolyLine(layer, x, y, col);
@@ -114,7 +114,6 @@ void CommandPolyLine::save( QTextStream& aStrm, const QGraphicsItem* aItem )
         ts.flush();
     }
 
-    qDebug() << cmd;
     aStrm << cmd;
 }
 
@@ -161,5 +160,5 @@ void CommandPolyLine::execute( SceneManager& aScene )
     pen.setWidth(0);
     item->setPen( pen );    
 
-    aScene.addItem( item, layer, LayerPartGraph );
+    aScene.addItem( item, layer, LayerCategoryGraph );
 }

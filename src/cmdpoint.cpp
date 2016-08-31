@@ -83,5 +83,5 @@ void CommandPoint::execute( SceneManager& aScene )
     item->setPen( Qt::NoPen );
     item->setBrush( color );
 
-    aScene.addItem( item, layer, LayerPartGraph );
+    aScene.addItem( item, layer, LayerCategoryGraph );
 }

@@ -22,6 +22,7 @@ GraphWidget::GraphWidget(QWidget* aParent)
     , mAutoFit( false )
     , mHighQuality( false )
 {
+    //setInteractive(false); // disable selection / item movement, but wheel-scroll is not working
     setInteractive(true);
     setCacheMode(CacheBackground);
     //setViewportUpdateMode(BoundingRectViewportUpdate);
@@ -35,6 +36,7 @@ GraphWidget::GraphWidget(QWidget* aParent)
     setResizeAnchor(QGraphicsView::AnchorUnderMouse);    
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );    
+
 
     mTimer = new QTimer(this);
     mTimer->setInterval(100);
@@ -82,21 +84,26 @@ void GraphWidget::keyPressEvent( QKeyEvent* aEvent )
 void GraphWidget::enterEvent( QEvent* aEvent )
 {
     QGraphicsView::enterEvent( aEvent );
-    viewport()->setCursor( Qt::ArrowCursor );
+    viewport()->setCursor(Qt::ArrowCursor);
 }
 
 void GraphWidget::mousePressEvent( QMouseEvent* aEvent )
 {
+    if( aEvent->button() == Qt::RightButton )
+    {
+        QGraphicsItem* itemUnderMouse = itemAt( aEvent->pos() );
+        scene()->clearSelection();
+        if( itemUnderMouse )
+            itemUnderMouse->setSelected(true);
+        aEvent->accept();
+        return;
+    }
+
     // the same condition as in QGraphicsView as there is no reliable signal for ScrollHandDrag start/stop
     if( dragMode() == QGraphicsView::ScrollHandDrag && aEvent->button() == Qt::LeftButton )
     {
         setAutoFit( false );
     }
-    else if( aEvent->button() == Qt::RightButton )
-    {
-        mSceneManager->setSelectedAt(mapToScene(aEvent->pos()));
-    }
-
     QGraphicsView::mousePressEvent( aEvent );
     viewport()->setCursor(Qt::ArrowCursor);
 }

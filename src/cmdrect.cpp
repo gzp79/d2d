@@ -105,5 +105,5 @@ void CommandRect::execute( SceneManager& aScene )
     brush.setColor( color );
     item->setBrush( brush );
 
-    aScene.addItem( item, layer, LayerPartGraph );
+    aScene.addItem( item, layer, LayerCategoryGraph );
 }

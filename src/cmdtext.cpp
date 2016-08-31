@@ -89,5 +89,5 @@ void CommandText::execute( SceneManager& aScene )
     item->setPos( x,-y );    
     item->setZValue( 1 );
 
-    aScene.addItem( item, layer, LayerPartText );
+    aScene.addItem( item, layer, LayerCategoryText );
 }

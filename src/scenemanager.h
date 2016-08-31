@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QGraphicsItem>
 #include <QGraphicsScene>
+#include <bitset>
 
 class QGraphicsScene;
 class QGraphicsItem;
@@ -23,17 +24,18 @@ class QGraphicsItemGroup;
     private:
 
 
-enum ELayerPart {
-    LayerPartGraph,
-    LayerPartText,
-    LayerPartCount
+enum ELayerCategory {
+    LayerCategoryGraph,
+    LayerCategoryText,
+    LayerCategoryCount
 };
+typedef std::bitset<LayerCategoryCount> LayerCategoryMask;
 
-QString getLayerPartName( ELayerPart aPart );
+QString getLayerCategoryName( ELayerCategory aPart );
 
 struct LayerInfo {
     QString name;
-    bool    visible[LayerPartCount];
+    LayerCategoryMask visibility;
 
     Qt::CheckState getAllCheckState() const;
 };
@@ -59,9 +61,10 @@ public:
     };
 
     enum {
-        DataTypeKey     = 1,
-        DataBound       = 2,
-        DataLayerKey    = 3,
+        DataTypeKey       = 1,
+        DataBound         = 2,
+        DataLayerKey      = 3,
+        DataLayerCategory = 4,
     };
 
     enum {
@@ -110,10 +113,10 @@ public:
     // overriden scene functionality
     void    clear();
     QRectF  itemsBoundingRect();
-    void    addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerPart aPart );
+    void    addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerCategory aCategory );
 
     LayerInfoList   getLayers() const;
-    void            setLayerVisibility( const QString& aName, ELayerPart aPart, bool aVisible );
+    void            setLayerVisibility( const QString& aName, ELayerCategory aCategory, bool aVisible );
 
     QGraphicsPointText* getTextAt( const QString& aLayer, QPointF aPnt );
     void                setSelectedAt( const QPointF& aPos );
@@ -126,15 +129,18 @@ signals:
 
 private:    
     typedef QMap<QPointF,QGraphicsPointText*>   PointToTextMap;
+    enum LayerCategory {
+        TextCategory,
+        GeometryCategory,
+        CategoryCount,
+    };
+
 
     struct LayerData {
-        QGraphicsItemGroup* parts[LayerPartCount];
         PointToTextMap      textMap;        // to speed up text groupping
+        LayerCategoryMask   visibility;
 
         LayerData();
-
-        bool    initParts( QGraphicsScene* aScene );
-        void    fillInfo(LayerInfo& aInfo ) const;
     };
     typedef QMap<QString,LayerData>    LayerMap;
 
@@ -156,6 +162,7 @@ private:
 
     LayerData&  createLayer( const QString& aName );
     LayerData*  findLayer( const QString& aName );
+    void        updateLayerVisibility();
 
     static QString getCacheFile( int aId );
 };

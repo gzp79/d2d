@@ -84,7 +84,6 @@ void CommandLine::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 void CommandLine::execute( SceneManager& aScene )
 {
     QGraphicsLineItem* item = new QGraphicsLineItem( x0,-y0,x1,-y1 );
-
     item->setData( SceneManager::DataTypeKey, QVariant(Type) );
     item->setData( SceneManager::DataBound, QVariant( QRectF(QPointF(x0,-y0),QPointF(x1,-y1)) ));
     item->setFlag( QGraphicsItem::ItemIsSelectable, true );
@@ -94,5 +93,5 @@ void CommandLine::execute( SceneManager& aScene )
     pen.setWidth(0);
     item->setPen( pen );
 
-    aScene.addItem( item, layer, LayerPartGraph );
+    aScene.addItem( item, layer, LayerCategoryGraph );
 }

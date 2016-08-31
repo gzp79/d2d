@@ -38,12 +38,12 @@ template <> inline bool qMapLessThanKey(const QPointF& key1, const QPointF& key2
     return key1.x() != key2.x() ? key1.x() < key2.x() : key1.y() < key2.y();
 }
 
-QString getLayerPartName( ELayerPart aPart )
+QString getLayerCategoryName( ELayerCategory aCategory )
 {
-    switch( aPart )
+    switch( aCategory )
     {
-        case LayerPartGraph: return "graph";
-        case LayerPartText:  return "text";
+        case LayerCategoryGraph: return "graph";
+        case LayerCategoryText:  return "text";
 
         default:
             Q_ASSERT(false);
@@ -55,14 +55,14 @@ QString getLayerPartName( ELayerPart aPart )
 Qt::CheckState LayerInfo::getAllCheckState() const
 {
     int cnt = 0;
-    for( int i = 0; i < LayerPartCount; ++i )
+    for( int i = 0; i < LayerCategoryCount; ++i )
     {
-        if( visible[i] )
+        if( visibility[i] )
             cnt++;
     }
     Qt::CheckState st = Qt::PartiallyChecked;
     if( cnt == 0 ) st = Qt::Unchecked;
-    if( cnt == LayerPartCount ) st = Qt::Checked;
+    if( cnt == LayerCategoryCount ) st = Qt::Checked;
 
     return st;
 }
@@ -138,37 +138,7 @@ QColor SceneManager::Command::toQColor( quint32 aCol )
 
 SceneManager::LayerData::LayerData()
 {
-    for( int i = 0; i < LayerPartCount; ++i )
-    {
-        parts[i] = NULL;
-    }
-}
-
-bool SceneManager::LayerData::initParts( QGraphicsScene* aScene )
-{
-    bool changed = false;
-    for( int i = 0; i < LayerPartCount; ++i )
-    {
-        if( parts[i] == NULL )
-        {
-            QGraphicsItemGroup* part = new QGraphicsItemGroup();
-            //part->setFlag(QGraphicsItem::ItemIsSelectable, true);
-            part->setData(DataLayerKey, QString("$layer"));
-            aScene->addItem( part );
-            parts[i] = part;
-            changed = true;
-        }
-    }
-
-    return changed;
-}
-
-void SceneManager::LayerData::fillInfo(LayerInfo& aInfo ) const
-{
-    for( int i = 0; i < LayerPartCount; ++i )
-    {
-        aInfo.visible[i] = parts[i] ? parts[i]->isVisible() : false;
-    }
+    visibility.set();
 }
 
 SceneManager::SceneManager()
@@ -246,7 +216,7 @@ void SceneManager::addCommand( const QString& aData )
         ++msgCount;
     }
 
-    qDebug() << "number of extracted json commands: " << msgCount;
+    // qDebug() << "number of extracted json commands: " << msgCount;
     if( tryCount > 0 )
     {
         qDebug() << "give up json parsing of '" << QString::fromUtf8(json_data) << "'";
@@ -342,7 +312,7 @@ void SceneManager::save( const QString& aFile ) const
 
     QTextStream strm( &file );
 
-    QList<QGraphicsItem*> itemList = /*mGraphicsScene->*/items();
+    QList<QGraphicsItem*> itemList = items();
     for( QList<QGraphicsItem*>::const_iterator it = itemList.begin(); it != itemList.end(); ++it )
     {
         QGraphicsItem* item = *it;
@@ -409,14 +379,8 @@ QRectF SceneManager::itemsBoundingRect()
     return QGraphicsScene::itemsBoundingRect();
 }
 
-void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerPart aPart )
+void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerCategory aCategory )
 {
-    Q_ASSERT( aLayer != "$layer" );
-    if( aLayer == "$layer" ) {
-        delete aItem;
-        return;
-    }
-
     QVariant r = aItem->data( DataBound );
     if( r.type() == QVariant::RectF )
     {
@@ -431,14 +395,13 @@ void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerP
     }
 
     aItem->setData(DataLayerKey, aLayer);
+    aItem->setData(DataLayerCategory, (int)aCategory);
 
     LayerData& layer = createLayer( aLayer );
-    if( aPart == LayerPartText )
-    {
-       layer.textMap.insert( aItem->pos(), (QGraphicsPointText*)aItem);
-    }
-
-    layer.parts[aPart]->addToGroup( aItem );
+    QGraphicsPointText* textItem = qgraphicsitem_cast<QGraphicsPointText*>(aItem);
+    if( textItem )
+        layer.textMap.insert( aItem->pos(), textItem);
+    QGraphicsScene::addItem( aItem );
 }
 
 LayerInfoList SceneManager::getLayers() const
@@ -449,41 +412,44 @@ LayerInfoList SceneManager::getLayers() const
        const LayerData& layer = it.value();
        LayerInfo info;
        info.name = it.key();
-       layer.fillInfo( info );
+       info.visibility = layer.visibility;
        lst.push_back( info );
     }
     return lst;
 }
 
-void SceneManager::setLayerVisibility( const QString& aName, ELayerPart aPart, bool aVisible )
+void SceneManager::setLayerVisibility( const QString& aName, ELayerCategory aCategory, bool aVisible )
 {
     LayerData* layer = findLayer( aName );
-    if( !layer )
+    if( !layer || aCategory < 0 )
         return;
 
-    int start = aPart;
-    int end = aPart+1;
-    if( aPart == LayerPartCount )
-    {
-        start = 0;
-        end = LayerPartCount;
-    }
-
     bool changed = false;
-    for( int i = start; i < end; ++i )
+    if( aCategory >= LayerCategoryCount )
     {
-        if( layer->parts[i]->isVisible() == aVisible )
-            continue;
-
-        layer->parts[i]->setVisible( aVisible );
-        changed = true;
+        if( aVisible )
+        {
+            changed = ~(layer->visibility).any();
+            layer->visibility.set();
+        }
+        else
+        {
+            changed = layer->visibility.any();
+            layer->visibility.reset();
+        }
+    }
+    else
+    {
+        changed = layer->visibility.test(aCategory) != aVisible;
+        layer->visibility.set(aCategory, aVisible);
     }
 
     if( changed )
     {
+        updateLayerVisibility();
         LayerInfo info;
         info.name = aName;
-        layer->fillInfo( info );
+        info.visibility = layer->visibility;
         emit onLayersVisibilityChanged( info );
     }
 }
@@ -579,13 +545,13 @@ void SceneManager::updateRect()
 
 SceneManager::LayerData& SceneManager::createLayer( const QString& aName )
 {
-    LayerData& layer = mLayers[aName];
-    if( layer.initParts( this ) )
-    {
+    LayerMap::iterator it = mLayers.find( aName );
+    if( it == mLayers.end() ) {
+        // qDebug() << "creating new layer " << aName;
+        it = mLayers.insert( it, aName, LayerData() );
         emit onLayersChanged();
     }
-
-    return layer;
+    return it.value();
 }
 
 SceneManager::LayerData* SceneManager::findLayer( const QString& aName )
@@ -596,3 +562,27 @@ SceneManager::LayerData* SceneManager::findLayer( const QString& aName )
 
     return &it.value();
 }
+
+void SceneManager::updateLayerVisibility()
+{
+    QList<QGraphicsItem*> allItems = items();
+    for( QList<QGraphicsItem*>::iterator it = allItems.begin(); it != allItems.end(); ++it )
+    {
+        QGraphicsItem* item = *it;
+        QString name = item->data( DataLayerKey ).toString();
+        int cat = item->data( DataLayerCategory ).toInt();
+        bool visible = true;
+        LayerData* layer = findLayer( name );
+        if( !layer || cat < 0 || cat > LayerCategoryCount )
+        {
+            visible = false;
+            continue;
+        }
+
+        visible = ( cat == LayerCategoryCount || layer->visibility.test( cat ) );
+        item->setVisible( visible );
+        if( !visible )
+            item->setSelected( false );
+    }
+}
+

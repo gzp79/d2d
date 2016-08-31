@@ -53,7 +53,7 @@ private slots:
 private:
     enum {
         DataLayerKey    = Qt::UserRole + 1,
-        DataLayerPartKey,
+        DataLayerCategoryKey,
     };
 
     Ui::MainWindow* ui;

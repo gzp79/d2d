@@ -118,9 +118,9 @@ void MainWindow::on_tblLayers_itemChanged( QTreeWidgetItem* aItem, int aColumn )
         return;
 
     QString layer = aItem->data( 0, DataLayerKey ).toString();
-    ELayerPart part = static_cast<ELayerPart>( aItem->data( aColumn, DataLayerPartKey ).toInt() );
+    ELayerCategory cat = static_cast<ELayerCategory>( aItem->data( aColumn, DataLayerCategoryKey ).toInt() );
     bool vis = aItem->checkState(aColumn) == Qt::Checked;
-    mSceneManager->setLayerVisibility( layer, part, vis );
+    mSceneManager->setLayerVisibility( layer, cat, vis );
 }
 
 void MainWindow::handleLayersVisibilityChanged( LayerInfo aInfo )
@@ -134,9 +134,9 @@ void MainWindow::handleLayersVisibilityChanged( LayerInfo aInfo )
     {
         QTreeWidgetItem* item = *it;
         item->setCheckState(1, aInfo.getAllCheckState() );
-        for( int i = 0; i < LayerPartCount; ++i )
+        for( int i = 0; i < LayerCategoryCount; ++i )
         {
-            item->setCheckState(2+i, aInfo.visible[i] ? Qt::Checked : Qt::Unchecked );
+            item->setCheckState(2+i, aInfo.visibility[i] ? Qt::Checked : Qt::Unchecked );
         }
     }
 
@@ -149,12 +149,12 @@ void MainWindow::handleLayersChanged()
     QStringList labels;
     labels.append( "Layer" );
     labels.append( "All" );
-    for( int i = 0; i < LayerPartCount; ++i )
+    for( int i = 0; i < LayerCategoryCount; ++i )
     {
-        labels.append( getLayerPartName( static_cast<ELayerPart>(i) ) );
+        labels.append( getLayerCategoryName( static_cast<ELayerCategory>(i) ) );
     }
     ui->tblLayers->clear();
-    ui->tblLayers->setColumnCount( LayerPartCount+2 );
+    ui->tblLayers->setColumnCount( LayerCategoryCount+2 );
     ui->tblLayers->setHeaderLabels( labels );
 
     LayerInfoList layers = mSceneManager->getLayers();    
@@ -168,13 +168,13 @@ void MainWindow::handleLayersChanged()
         ++col;
 
         item->setCheckState(col, it->getAllCheckState() );
-        item->setData(col,DataLayerPartKey,LayerPartCount);
+        item->setData(col,DataLayerCategoryKey,LayerCategoryCount);
         ++col;
 
-        for( int i = 0; i < LayerPartCount; ++i )
+        for( int i = 0; i < LayerCategoryCount; ++i )
         {
-            item->setCheckState(col, it->visible[i] ? Qt::Checked : Qt::Unchecked );
-            item->setData(col,DataLayerPartKey,i);
+            item->setCheckState(col, it->visibility[i] ? Qt::Checked : Qt::Unchecked );
+            item->setData(col,DataLayerCategoryKey,i);
             ++col;
         }
 
@@ -183,7 +183,7 @@ void MainWindow::handleLayersChanged()
 
     //resize the columns
     // todo: should be done only once maybe
-    for( int i = 1; i < LayerPartCount+2; i++ )
+    for( int i = 1; i < LayerCategoryCount+2; i++ )
     {
         ui->tblLayers->resizeColumnToContents(i);
     }
@@ -221,36 +221,73 @@ void MainWindow::on_btnOpen_clicked()
 
 void MainWindow::on_btnTest_clicked()
 {
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"clear\" }" ) );    
+    int test = 0;
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-red\",   \"color\":\"0xffff0000\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-green\", \"color\":\"0xff00ff00\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-blue\",  \"color\":\"0xff0000ff\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-white\", \"color\":\"0xffffffff\" }") );
+    switch( test ) {
+        case 0: {
+            // simple command test
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"clear\" }" ) );
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":-180, \"y\":-90, \"text\":\"left bottom\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":-180, \"y\": 90, \"text\":\"left top\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\": 180, \"y\":-90, \"text\":\"right bottom\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\": 180, \"y\": 90, \"text\":\"right top\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-red\",   \"color\":\"0xffff0000\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-green\", \"color\":\"0xff00ff00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-blue\",  \"color\":\"0xff0000ff\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"layer\":\"layer1\", \"x\":   0, \"y\": 0,  \"text\":\"center-white\", \"color\":\"0xffffffff\" }") );
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"point\", \"layer\":\"layer1\", \"x\": 90, \"y\":45, \"color\":\"0xffff0000\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"point\", \"x\":-90, \"y\":45, \"color\":\"0xff00ff00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":-180, \"y\":-90, \"text\":\"left bottom\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":-180, \"y\": 90, \"text\":\"left top\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\": 180, \"y\":-90, \"text\":\"right bottom\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\": 180, \"y\": 90, \"text\":\"right top\" }") );
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"line\", \"layer\":\"layer1\", \"x0\": 90, \"y0\":-45, \"x1\":-90, \"y1\":-45, \"color\":\"0xff00ff00\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"rect\", \"x0\": 90, \"y0\":-45, \"x1\":-90, \"y1\": 45, \"color\":\"0x7f1f2f3f\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"point\", \"layer\":\"layer1\", \"x\": 90, \"y\":45, \"color\":\"0xffff0000\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"point\", \"x\":-90, \"y\":45, \"color\":\"0xff00ff00\" }") );
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"polyline\", \"x\": [20,90,20,90], \"y\": [20,20,90,90], \"color\":\"0xfff66f00\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":20, \"y\":20, \"text\":\"pl0\", \"color\":\"0xfff66f00\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":20, \"text\":\"pl1\", \"color\":\"0xfff66f00\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":20, \"y\":90, \"text\":\"pl2\", \"color\":\"0xfff66f00\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":90, \"text\":\"pl3\", \"color\":\"0xfff66f00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"line\", \"layer\":\"layer1\", \"x0\": 90, \"y0\":-45, \"x1\":-90, \"y1\":-45, \"color\":\"0xff00ff00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"rect\", \"x0\": 90, \"y0\":-45, \"x1\":-90, \"y1\": 45, \"color\":\"0x7f1f2f3f\" }") );
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"poly\", \"x\": [0,90,90], \"y\": [0,0,20], \"color\":\"0x7f1f2f3f\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":0, \"y\":0, \"text\":\"p0\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":0, \"text\":\"p1\" }") );
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":20, \"text\":\"p2\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"polyline\", \"x\": [20,90,20,90], \"y\": [20,20,90,90], \"color\":\"0xfff66f00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":20, \"y\":20, \"text\":\"pl0\", \"color\":\"0xfff66f00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":20, \"text\":\"pl1\", \"color\":\"0xfff66f00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":20, \"y\":90, \"text\":\"pl2\", \"color\":\"0xfff66f00\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":90, \"text\":\"pl3\", \"color\":\"0xfff66f00\" }") );
 
-    mSceneManager->addCommand( QByteArray( "{ \"command\":\"cache\", \"id\":\"1\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"poly\", \"x\": [0,90,90], \"y\": [0,0,20], \"color\":\"0x7f1f2f3f\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":0, \"y\":0, \"text\":\"p0\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":0, \"text\":\"p1\" }") );
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"text\", \"x\":90, \"y\":20, \"text\":\"p2\" }") );
+
+            mSceneManager->addCommand( QByteArray( "{ \"command\":\"cache\", \"id\":\"1\" }") );
+        } break;
+
+        case 1: {
+            // stress test
+            QByteArray cmd;
+            int cnt = 100;
+            int k = 0;
+            for( int y = 0; y < cnt; y += 1 )
+            {
+                for( int x = 0; x < cnt; x += 1 )
+                {
+                    int sx = x * 10;
+                    int sy = y * 10;
+
+                    cmd.clear();
+                    QTextStream(&cmd) << "{ \"command\":\"text\", \"x\":" << sx << ", \"y\":" << sy <<", \"text\":\"id_" << k << "\" }";
+                    mSceneManager->addCommand(cmd);
+
+                    cmd.clear();
+                    QTextStream(&cmd) << "{ \"command\":\"text\", \"x\":" << sx << ", \"y\":" << sy <<", \"text\":\"idr_" << k << "\", \"color\":\"0xffff0000\" }";
+                    mSceneManager->addCommand(cmd);
+
+                    cmd.clear();
+                    QTextStream(&cmd) << "{ \"command\":\"point\", \"x\":" << sx-5 << ", \"y\":" << sy << "}";
+                    mSceneManager->addCommand(cmd);
+
+                    ++k;
+                }
+            }
+        } break;
+        default: break;
+    }
 }
 
 void MainWindow::on_btnScreenCapture_clicked()
