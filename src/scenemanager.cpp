@@ -19,7 +19,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <QGraphicsItemGroup>
-#include "qgraphicspointtext.h"
+#include "qgraphicspointtextitem.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -398,7 +398,7 @@ void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerC
     aItem->setData(DataLayerCategory, (int)aCategory);
 
     LayerData& layer = createLayer( aLayer );
-    QGraphicsPointText* textItem = qgraphicsitem_cast<QGraphicsPointText*>(aItem);
+    QGraphicsPointTextItem* textItem = qgraphicsitem_cast<QGraphicsPointTextItem*>(aItem);
     if( textItem )
         layer.textMap.insert( aItem->pos(), textItem);
     QGraphicsScene::addItem( aItem );
@@ -454,13 +454,13 @@ void SceneManager::setLayerVisibility( const QString& aName, ELayerCategory aCat
     }
 }
 
-QGraphicsPointText* SceneManager::getTextAt( const QString& aLayer, QPointF aPnt )
+QGraphicsPointTextItem* SceneManager::getTextAt( const QString& aLayer, QPointF aPnt )
 {
     LayerData* layer = findLayer( aLayer );
     if( !layer )
         return NULL;
 
-    QMap<QPointF,QGraphicsPointText*>::iterator it = layer->textMap.find( aPnt );
+    QMap<QPointF,QGraphicsPointTextItem*>::iterator it = layer->textMap.find( aPnt );
     if( it == layer->textMap.end() )
         return NULL;
     return it.value();

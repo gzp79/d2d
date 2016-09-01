@@ -174,7 +174,7 @@
      </layout>
     </item>
     <item row="1" column="0">
-     <widget class="GraphWidget" name="graphView">
+     <widget class="QGraphWidget" name="graphView">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -285,9 +285,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GraphWidget</class>
+   <class>QGraphWidget</class>
    <extends>QFrame</extends>
-   <header>graphwidget.h</header>
+   <header>qgraphwidget.h</header>
    <container>1</container>
    <slots>
     <signal>onAutoFitChanged(bool)</signal>

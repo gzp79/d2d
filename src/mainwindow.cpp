@@ -2,7 +2,7 @@
 // Distributed under MIT License.
 
 #include "mainwindow.h"
-#include "graphwidget.h"
+#include "qgraphwidget.h"
 #include "ui_mainwindow.h"
 #include "scenemanager.h"
 
@@ -22,10 +22,10 @@ MainWindow::MainWindow( SceneManager* aSceneManager, QWidget *parent)
     ui->setupUi(this);
 
     ui->graphView->setSceneManager( mSceneManager );
-    ui->cbxBackground->addItem("Black", QVariant(GraphWidget::BackBlack));
-    ui->cbxBackground->addItem("White", QVariant(GraphWidget::BackWhite));
-    ui->cbxBackground->addItem("Globe", QVariant(GraphWidget::BackGlobe));
-    ui->cbxBackground->addItem("BackGradient", QVariant(GraphWidget::BackGradient));
+    ui->cbxBackground->addItem("Black", QVariant(QGraphWidget::BackBlack));
+    ui->cbxBackground->addItem("White", QVariant(QGraphWidget::BackWhite));
+    ui->cbxBackground->addItem("Globe", QVariant(QGraphWidget::BackGlobe));
+    ui->cbxBackground->addItem("BackGradient", QVariant(QGraphWidget::BackGradient));
 
     ui->cbxSceneArea->addItem("Increasing", QVariant(SceneManager::AreaAuto));
     ui->cbxSceneArea->addItem("Area [0..1]^2", QVariant(SceneManager::Area01));
@@ -259,6 +259,7 @@ void MainWindow::on_btnTest_clicked()
         } break;
 
         case 1: {
+
             // stress test
             QByteArray cmd;
             int cnt = 100;

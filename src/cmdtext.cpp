@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QPainter>
-#include "qgraphicspointtext.h"
+#include "qgraphicspointtextitem.h"
 #include <QJsonObject>
 #include <QJsonValue>
 
@@ -49,16 +49,16 @@ CommandText* CommandText::parse( const QJsonObject& aData )
 
 void CommandText::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 {
-    const QGraphicsPointText* text = qgraphicsitem_cast<const QGraphicsPointText*>(aItem);
+    const QGraphicsPointTextItem* text = qgraphicsitem_cast<const QGraphicsPointTextItem*>(aItem);
     Q_ASSERT( text != NULL );
     if( !text )
         return;
 
-    const QGraphicsPointText::DataVector& data = text->getData();
+    const QGraphicsPointTextItem::DataVector& data = text->getData();
 
     QByteArray cmd;
     QTextStream ts(&cmd);
-    for( QGraphicsPointText::DataVector::const_iterator it = data.begin(); it != data.end(); ++it )
+    for( QGraphicsPointTextItem::DataVector::const_iterator it = data.begin(); it != data.end(); ++it )
     {
         ts << "{\"command\":\"text\","
             << "\"layer\":\"" << toLayer(aItem) << "\","
@@ -74,14 +74,14 @@ void CommandText::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 
 void CommandText::execute( SceneManager& aScene )
 {
-    QGraphicsPointText* item = aScene.getTextAt( layer, QPointF(x,-y) );
+    QGraphicsPointTextItem* item = aScene.getTextAt( layer, QPointF(x,-y) );
     if( item )
     {        
         item->addText( text, toQColor(col) );
         return;
     }
 
-    item = new QGraphicsPointText( text, toQColor( col ) );
+    item = new QGraphicsPointTextItem( text, toQColor( col ) );
     item->setData( SceneManager::DataTypeKey, QVariant(Type) );
     item->setData( SceneManager::DataBound, QVariant( QPointF(x,-y) ));
     item->setFlag( QGraphicsItem::ItemIsSelectable, true );

@@ -1,7 +1,7 @@
 // Copyright (c) 2005-2016 Gzp
 // Distributed under MIT License.
 
-#include "graphwidget.h"
+#include "qgraphwidget.h"
 #include "scenemanager.h"
 
 #include <math.h>
@@ -14,7 +14,7 @@
 #include <QScrollBar>
 #include <QApplication>
 
-GraphWidget::GraphWidget(QWidget* aParent)
+QGraphWidget::QGraphWidget(QWidget* aParent)
     : QGraphicsView(aParent)
     , mSceneManager( NULL )
     , mBackground( NULL )
@@ -22,21 +22,17 @@ GraphWidget::GraphWidget(QWidget* aParent)
     , mAutoFit( false )
     , mHighQuality( false )
 {
-    //setInteractive(false); // disable selection / item movement, but wheel-scroll is not working
-    setInteractive(true);
-    setCacheMode(CacheBackground);
-    //setViewportUpdateMode(BoundingRectViewportUpdate);
-    setViewportUpdateMode(FullViewportUpdate);
-    //setRenderHint(QPainter::Antialiasing);
-    setRenderHint(QPainter::TextAntialiasing);
-    //setRenderHint(QPainter::HighQualityAntialiasing);
 
+    setCacheMode(CacheBackground);
+    setViewportUpdateMode(FullViewportUpdate);
+    setRenderHint(QPainter::TextAntialiasing);
+
+    setInteractive(false);
     setDragMode(ScrollHandDrag);
-    setTransformationAnchor(AnchorUnderMouse);
-    setResizeAnchor(QGraphicsView::AnchorUnderMouse);    
+    setTransformationAnchor(QGraphicsView::AnchorViewCenter);
+    setResizeAnchor(QGraphicsView::AnchorViewCenter);
     setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );    
-
 
     mTimer = new QTimer(this);
     mTimer->setInterval(100);
@@ -44,7 +40,7 @@ GraphWidget::GraphWidget(QWidget* aParent)
     mTimer->start();    
 }
 
-GraphWidget::~GraphWidget()
+QGraphWidget::~QGraphWidget()
 {
     if( mBackground )
     {
@@ -53,7 +49,7 @@ GraphWidget::~GraphWidget()
     }
 }
 
-void GraphWidget::setSceneManager( SceneManager* aSceneManager )
+void QGraphWidget::setSceneManager( SceneManager* aSceneManager )
 {
     mSceneManager = aSceneManager;
     setScene( mSceneManager );
@@ -61,7 +57,7 @@ void GraphWidget::setSceneManager( SceneManager* aSceneManager )
     setBackground( BackBlack );
 }
 
-void GraphWidget::setAutoFit( bool aFit )
+void QGraphWidget::setAutoFit( bool aFit )
 {    
     if( mAutoFit == aFit )
         return;
@@ -75,19 +71,19 @@ void GraphWidget::setAutoFit( bool aFit )
     emit onAutoFitChanged(mAutoFit);
 }
 
-void GraphWidget::keyPressEvent( QKeyEvent* aEvent )
+void QGraphWidget::keyPressEvent( QKeyEvent* aEvent )
 {
     setAutoFit( false );
     QGraphicsView::keyPressEvent(aEvent);
 }
 
-void GraphWidget::enterEvent( QEvent* aEvent )
+void QGraphWidget::enterEvent( QEvent* aEvent )
 {
     QGraphicsView::enterEvent( aEvent );
     viewport()->setCursor(Qt::ArrowCursor);
 }
 
-void GraphWidget::mousePressEvent( QMouseEvent* aEvent )
+void QGraphWidget::mousePressEvent( QMouseEvent* aEvent )
 {
     if( aEvent->button() == Qt::RightButton )
     {
@@ -95,6 +91,7 @@ void GraphWidget::mousePressEvent( QMouseEvent* aEvent )
         scene()->clearSelection();
         if( itemUnderMouse )
             itemUnderMouse->setSelected(true);
+        scene()->invalidate(); // workaround as selection change does not result an invalidation sometimes
         aEvent->accept();
         return;
     }
@@ -108,27 +105,27 @@ void GraphWidget::mousePressEvent( QMouseEvent* aEvent )
     viewport()->setCursor(Qt::ArrowCursor);
 }
 
-void GraphWidget::mouseReleaseEvent( QMouseEvent* aEvent )
+void QGraphWidget::mouseReleaseEvent( QMouseEvent* aEvent )
 {
     QGraphicsView::mouseReleaseEvent( aEvent );
     viewport()->setCursor( Qt::ArrowCursor );
 }
 
 #ifndef QT_NO_WHEELEVENT
-void GraphWidget::wheelEvent(QWheelEvent* aEvent)
+void QGraphWidget::wheelEvent(QWheelEvent* aEvent)
 {
     qreal sc = pow(1.25, aEvent->delta() / 240.);
-    zoom(sc);
+    zoomToPixel(aEvent->pos(), sc);
     setAutoFit( false );
 }
 #endif
 
-void GraphWidget::zoom(qreal scaleFactor)
+void QGraphWidget::zoom(qreal scaleFactor)
 {
     scale(scaleFactor, scaleFactor);
 }
 
-void GraphWidget::releaseBackground()
+void QGraphWidget::releaseBackground()
 {
     if( mBackground )
     {
@@ -137,7 +134,7 @@ void GraphWidget::releaseBackground()
     }
 }
 
-void GraphWidget::setHighQuality( bool aEnable )
+void QGraphWidget::setHighQuality( bool aEnable )
 {
     if( mHighQuality == aEnable )
         return;
@@ -150,7 +147,7 @@ void GraphWidget::setHighQuality( bool aEnable )
     emit onHighQualityChanged(mHighQuality);
 }
 
-void GraphWidget::setBackground( int aType )
+void QGraphWidget::setBackground( int aType )
 {
     if( mBackgroundType == aType )
         return;
@@ -196,27 +193,57 @@ void GraphWidget::setBackground( int aType )
     emit onBackgroundChanged(mBackgroundType);
 }
 
-void GraphWidget::clear()
+void QGraphWidget::clear()
 {
     mSceneManager->clear();
 }
 
-void GraphWidget::zoomIn()
+void QGraphWidget::zoomIn()
 {
-    zoom(qreal(1.2));
+    qreal f = qreal(1.2);
+    scale( f, f );
+    setAutoFit( false );
 }
 
-void GraphWidget::zoomOut()
+void QGraphWidget::zoomOut()
 {
-    zoom(1 / qreal(1.2));
+    qreal f = 1/qreal(1.2);
+    scale( f, f );
+    setAutoFit( false );
 }
 
-void GraphWidget::zoomFit()
+void QGraphWidget::zoomToPixel( const QPoint& aViewPos, qreal aZoom )
+{
+    QTransform tr;
+
+
+    QPoint  pos  = aViewPos;
+    QPointF posf = mapToScene(aViewPos);
+
+    //centerOn( aScenePoint );
+    scale( aZoom, aZoom );
+    double w = this->viewport()->width();
+    double h = this->viewport()->height();
+
+    double wf = mapToScene(QPoint(w-1, 0)).x() - mapToScene(QPoint(0,0)).x();
+    double hf = mapToScene(QPoint(0, h-1)).y() - mapToScene(QPoint(0,0)).y();
+
+    double lf = posf.x() - pos.x() * wf / w;
+    double tf = posf.y() - pos.y() * hf / h;
+
+    ensureVisible(lf, tf, wf, hf, 0, 0);
+
+    QPointF newPos = mapToScene(pos);
+
+    ensureVisible(QRectF(QPointF(lf, tf) - newPos + posf, QSizeF(wf, hf)), 0, 0);
+}
+
+void QGraphWidget::zoomFit()
 {
     fitInView( mSceneManager->itemsBoundingRect(), Qt::KeepAspectRatio );
 }
 
-void GraphWidget::updateCommands()
+void QGraphWidget::updateCommands()
 {
     if( mSceneManager )
     {
@@ -227,7 +254,7 @@ void GraphWidget::updateCommands()
     }
 }
 
-void GraphWidget::drawBackground( QPainter* aPainter, const QRectF& aRect )
+void QGraphWidget::drawBackground( QPainter* aPainter, const QRectF& aRect )
 {
     QGraphicsView::drawBackground( aPainter, aRect );
 

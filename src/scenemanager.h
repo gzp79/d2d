@@ -14,7 +14,7 @@
 class QGraphicsScene;
 class QGraphicsItem;
 class QTextStream;
-class QGraphicsPointText;
+class QGraphicsPointTextItem;
 class QGraphicsItemGroup;
 
 #define Q_GRAPHICSITEM( A )                                 \
@@ -69,6 +69,7 @@ public:
 
     enum {
         GraphicsText = QGraphicsItem::UserType + 1,
+        GraphicsPoint,
     };
 
     enum {
@@ -118,7 +119,7 @@ public:
     LayerInfoList   getLayers() const;
     void            setLayerVisibility( const QString& aName, ELayerCategory aCategory, bool aVisible );
 
-    QGraphicsPointText* getTextAt( const QString& aLayer, QPointF aPnt );
+    QGraphicsPointTextItem* getTextAt( const QString& aLayer, QPointF aPnt );
     void                setSelectedAt( const QPointF& aPos );
 
 signals:
@@ -128,7 +129,7 @@ signals:
     void onLayersChanged();
 
 private:    
-    typedef QMap<QPointF,QGraphicsPointText*>   PointToTextMap;
+    typedef QMap<QPointF,QGraphicsPointTextItem*>   PointToTextMap;
     enum LayerCategory {
         TextCategory,
         GeometryCategory,

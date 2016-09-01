@@ -6,36 +6,41 @@ QT += network
 CONFIG += console
 
 HEADERS += \
-    graphwidget.h \
     mainwindow.h \
-    inputtcp.h \
     scenemanager.h \
+    inputtcp.h \
+    inputnativeevent.h \
+    \
+    cmdctrl.h \
+    cmdpoint.h \
     cmdline.h \
     cmdrect.h \
     cmdtext.h \
-    inputnativeevent.h \
-    cmdpoint.h \
-    qgraphicspointtext.h \
-    cmdctrl.h \
     cmdpoly.h \
-    cmdpolyline.h
+    cmdpolyline.h \
+    \
+    qgraphicspointitem.h \
+    qgraphicspointtextitem.h \
+    qgraphwidget.h
 
 SOURCES += \
     main.cpp \
-    graphwidget.cpp \
     mainwindow.cpp \
-    inputtcp.cpp \
     scenemanager.cpp \
+    inputtcp.cpp \
+    inputnativeevent.cpp \
+    \
+    cmdctrl.cpp \
+    cmdpoint.cpp \
     cmdline.cpp \
     cmdrect.cpp \
     cmdtext.cpp \
-    inputnativeevent.cpp \
-    cmdpoint.cpp \
-    qgraphicspointtext.cpp \
-    cmdctrl.cpp \
     cmdpoly.cpp \
-    cmdpolyline.cpp
-
+    cmdpolyline.cpp \
+    \
+    qgraphicspointitem.cpp \
+    qgraphicspointtextitem.cpp \
+    qgraphwidget.cpp
 
 
 FORMS += \

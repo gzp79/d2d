@@ -1,7 +1,7 @@
 // Copyright (c) 2005-2016 Gzp
 // Distributed under MIT License.
 
-#include "qgraphicspointtext.h"
+#include "qgraphicspointtextitem.h"
 
 #include <QColor>
 #include <QBrush>
@@ -10,7 +10,7 @@
 #include <QDebug>
 #include "scenemanager.h"
 
-QGraphicsPointText::QGraphicsPointText( const QString& aText, const QColor& aCol )
+QGraphicsPointTextItem::QGraphicsPointTextItem( const QString& aText, const QColor& aCol )
     : QGraphicsTextItem()
 {
     mData.append( Data(aCol, aText) );
@@ -20,14 +20,14 @@ QGraphicsPointText::QGraphicsPointText( const QString& aText, const QColor& aCol
 
 }
 
-void QGraphicsPointText::addText( const QString& aText, const QColor& aCol )
+void QGraphicsPointTextItem::addText( const QString& aText, const QColor& aCol )
 {
     mData.append( Data(aCol, aText) );
     this->setHtml( genHtml() );
     update();
 }
 
-void QGraphicsPointText::paint(QPainter* aPainter, const QStyleOptionGraphicsItem* aStyleOpt, QWidget* aWidget )
+void QGraphicsPointTextItem::paint(QPainter* aPainter, const QStyleOptionGraphicsItem* aStyleOpt, QWidget* aWidget )
 {
     QGraphicsTextItem::paint( aPainter,aStyleOpt,aWidget );
 
@@ -44,7 +44,7 @@ void QGraphicsPointText::paint(QPainter* aPainter, const QStyleOptionGraphicsIte
     }
 }
 
-QString QGraphicsPointText::genHtml() const
+QString QGraphicsPointTextItem::genHtml() const
 {
     QString html = "<html><body>";
     bool first = true;

@@ -7,11 +7,12 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QGraphicsItem>
-#include <QGraphicsEllipseItem>
 #include <QPen>
 #include <QBrush>
 #include <QJsonObject>
 #include <QJsonValue>
+
+#include "qgraphicspointitem.h"
 
 CommandPoint::CommandPoint()
     : SceneManager::Command( Type )
@@ -51,18 +52,18 @@ CommandPoint* CommandPoint::parse( const QJsonObject& aData )
 
 void CommandPoint::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 {
-    const QGraphicsEllipseItem* ellipse = qgraphicsitem_cast<const QGraphicsEllipseItem*>(aItem);
-    Q_ASSERT( ellipse != NULL );
-    if( !ellipse )
+    const QGraphicsPointItem* item = qgraphicsitem_cast<const QGraphicsPointItem*>(aItem);
+    Q_ASSERT( item != NULL );
+    if( !item )
         return;
 
-    QColor col = ellipse->brush().color();
+    QColor col = item->color();
 
     QByteArray cmd;
     QTextStream(&cmd) << "{\"command\":\"point\","
         << "\"layer\":\"" << toLayer(aItem) << "\","
-        << "\"x\":" << ellipse->x() << ","
-        << "\"y\":" << -ellipse->y() << ","
+        << "\"x\":" << item->x() << ","
+        << "\"y\":" << -item->y() << ","
         << "\"color\":" << toCol32( col )
         << "}";
     aStrm << cmd;
@@ -70,18 +71,13 @@ void CommandPoint::save( QTextStream& aStrm, const QGraphicsItem* aItem )
 
 void CommandPoint::execute( SceneManager& aScene )
 {
-    QGraphicsEllipseItem* item = new QGraphicsEllipseItem( -1.5, -1.5, 3,3 );
+    QGraphicsPointItem* item = new QGraphicsPointItem( toQColor(col) );
     item->setData( SceneManager::DataTypeKey, QVariant( Type ) );
     item->setData( SceneManager::DataBound, QVariant( QPointF(x,-y) ));
     item->setFlag( QGraphicsItem::ItemIsSelectable, true );
 
-    item->setPos(x,-y);
-    item->setFlag(QGraphicsItem::ItemIgnoresTransformations);
-    item->setZValue( 1 );
-
-    QColor color( toQColor(col) );
-    item->setPen( Qt::NoPen );
-    item->setBrush( color );
+    item->setPos(x,-y);    
+    item->setZValue( 1 );    
 
     aScene.addItem( item, layer, LayerCategoryGraph );
 }

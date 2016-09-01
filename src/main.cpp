@@ -1,7 +1,7 @@
 // Copyright (c) 2005-2016 Gzp
 // Distributed under MIT License.
 
-#include "graphwidget.h"
+#include "qgraphwidget.h"
 #include "inputtcp.h"
 #include "scenemanager.h"
 #include "mainwindow.h"

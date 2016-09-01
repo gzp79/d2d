@@ -1,13 +1,13 @@
 // Copyright (c) 2005-2016 Gzp
 // Distributed under MIT License.
 
-#ifndef QGRAPHICSPOINTTEXT
-#define QGRAPHICSPOINTTEXT
+#ifndef QGRAPHICSPOINTTEXTITEM
+#define QGRAPHICSPOINTTEXTITEM
 
 #include "scenemanager.h"
 #include <QGraphicsTextItem>
 
-class QGraphicsPointText : public QGraphicsTextItem
+class QGraphicsPointTextItem : public QGraphicsTextItem
 {
     Q_GRAPHICSITEM( SceneManager::GraphicsText )
 
@@ -31,7 +31,7 @@ public:
     };
     typedef QVector<Data> DataVector;
 
-    QGraphicsPointText( const QString& aStr, const QColor& aCol );
+    QGraphicsPointTextItem( const QString& aStr, const QColor& aCol );
 
     void addText( const QString& aText, const QColor& aCol );
     const DataVector& getData() const { return mData; }
@@ -44,5 +44,5 @@ protected:
     QString genHtml() const;
 };
 
-#endif // QGRAPHICSPOINTTEXT
+#endif // QGRAPHICSPOINTTEXTITEM
 

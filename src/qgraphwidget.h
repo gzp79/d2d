@@ -10,7 +10,7 @@ class SceneManager;
 class QTimer;
 class QPixmap;
 
-class GraphWidget : public QGraphicsView
+class QGraphWidget : public QGraphicsView
 {
     Q_OBJECT
 
@@ -24,8 +24,8 @@ public:
         BackInvalid,
     };
 
-    GraphWidget(QWidget *parent = 0);
-    virtual ~GraphWidget();
+    QGraphWidget(QWidget *parent = 0);
+    virtual ~QGraphWidget();
 
     void    setSceneManager( SceneManager* aSceneManager );
 
@@ -35,6 +35,7 @@ public slots:
     void clear();
     void zoomIn();
     void zoomOut();
+    void zoomToPixel( const QPoint& aViewPos, qreal aZoom );
     void zoomFit();
     void setAutoFit( bool aFit );
     void updateCommands();
