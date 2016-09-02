@@ -1,4 +1,4 @@
-version: v1.0.{build}
+version: v1.1.{build}
 
 install:
   - set QTDIR=C:\Qt\5.5\mingw492_32
