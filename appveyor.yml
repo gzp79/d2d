@@ -15,3 +15,12 @@ build_script:
 
 artifacts:
   - path: d2d-$(appveyor_build_version).7z
+  
+deploy:
+- provider: GitHub
+  tag: appveyor_$(appveyor_build_version)
+  release: appveyor_$(appveyor_build_version)
+  auth_token:
+    secure: j4Wk/mliUIcp94vmGOkoIOw5NGeknHDR20PaY8pCaTaD9brCAjHNv9ZmMDLDLpZN
+  artifact: d2d-$(appveyor_build_version).7z
+  prerelease: false  
