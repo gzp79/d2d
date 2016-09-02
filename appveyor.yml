@@ -5,3 +5,4 @@ install:
 build_script:
   - qmake src\d2d.pro
   - mingw32-make
+  - appveyor\deploy.bat
