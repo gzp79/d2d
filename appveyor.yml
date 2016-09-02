@@ -1,4 +1,4 @@
-version: v1.1.{build}
+version: appveyor_build_{build}
 
 install:
   - set QTDIR=C:\Qt\5.5\mingw492_32
