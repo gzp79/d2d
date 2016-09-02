@@ -1,13 +1,17 @@
+version: v1.0.{build}
+
 install:
   - set QTDIR=C:\Qt\5.5\mingw492_32
   - set PATH=%PATH%;%QTDIR%\bin;C:\MinGW\bin
-  
+
 build_script:
   - qmake src\d2d.pro
   - mingw32-make
   - set BUILDDIR=release
   - dir %BUILDDIR%
   - appveyor\deploy.bat
+  - dir deploy
+  - dir deploy\d2d-$(appveyor_build_version)
 
 artifacts:
-- path: deploy\d2d-$(platform)-$(appveyor_build_version).7z
+- path: deploy\d2d-$(appveyor_build_version).7z
