@@ -10,4 +10,4 @@ build_script:
   - appveyor\deploy.bat
 
 artifacts:
-- path: d2d-binary-$(platform)-$(appveyor_build_version).zip
+- path: deploy\d2d-$(platform)-$(appveyor_build_version).7z
