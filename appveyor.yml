@@ -14,4 +14,4 @@ build_script:
   - dir deploy\%DEPLOY_NAME%
 
 artifacts:
-- path: deploy\%DEPLOY_NAME%.7z
+  - path: %DEPLOY_NAME%.7z

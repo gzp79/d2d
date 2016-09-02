@@ -14,5 +14,5 @@ windeployqt --compiler-runtime --dir deploy\%DEPLOY_NAME% %BUILDDIR%\d2d.exe
 
 @echo compressing
 cd deploy
-7z a %DEPLOY_NAME%.7z %DEPLOY_NAME%
+7z a ..\%DEPLOY_NAME%.7z %DEPLOY_NAME%
 cd ..
