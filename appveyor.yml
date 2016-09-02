@@ -14,4 +14,4 @@ build_script:
   - dir deploy\%DEPLOY_NAME%
 
 artifacts:
-  - path: %DEPLOY_NAME%.7z
+  - path: d2d-$(appveyor_build_version).7z
