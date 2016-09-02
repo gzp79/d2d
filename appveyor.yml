@@ -3,7 +3,7 @@ version: v1.0.{build}
 install:
   - set QTDIR=C:\Qt\5.5\mingw492_32
   - set PATH=%PATH%;%QTDIR%\bin;C:\MinGW\bin
-  - set DEPLOY_NAME=d2d-%APPVEYOR_BUILD_VERSION%
+  - set DEPLOY_NAME=d2d-%APPVEYOR_REPO_TAG_NAME%
 
 build_script:
   - qmake src\d2d.pro
@@ -14,14 +14,14 @@ build_script:
   - dir deploy\%DEPLOY_NAME%
 
 artifacts:
-  - path: d2d-$(appveyor_build_version).7z
+  - path: d2d-$(APPVEYOR_REPO_TAG_NAME).7z
   
 deploy:
   - provider: GitHub
-    release: appveyor_$(appveyor_build_version)
+    release: appveyor_$(APPVEYOR_REPO_TAG_NAME)
     auth_token:
       secure: j4Wk/mliUIcp94vmGOkoIOw5NGeknHDR20PaY8pCaTaD9brCAjHNv9ZmMDLDLpZN
-    artifact: d2d-$(appveyor_build_version).7z
+    artifact: d2d-$(APPVEYOR_REPO_TAG_NAME).7z
     prerelease: false  
     draft: false
     on:
