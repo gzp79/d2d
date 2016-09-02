@@ -15,7 +15,7 @@ rem copy "%QTDIR%\bin\libwinpthread-1.dll" deploy\d2d\
 
 windeployqt --compiler-runtime --dir deploy\d2d %BUILDDIR%\d2d.exe
 
-@echo compressing
-cd deploy
-zip -9 d2d.zip d2d\*
-cd ..
+rem @echo compressing
+rem cd deploy
+rem zip -9 d2d.zip d2d\*
+rem cd ..
