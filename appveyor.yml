@@ -18,10 +18,11 @@ artifacts:
   
 deploy:
   - provider: GitHub
-    release: appveyor_$(APPVEYOR_REPO_TAG_NAME)
+    tag: $(appveyor_repo_tag_name)
+    release: appveyor_$(appveyor_repo_tag_name)
     auth_token:
       secure: j4Wk/mliUIcp94vmGOkoIOw5NGeknHDR20PaY8pCaTaD9brCAjHNv9ZmMDLDLpZN
-    artifact: d2d-$(APPVEYOR_REPO_TAG_NAME).7z
+    artifact: d2d-$(appveyor_repo_tag_name).7z
     prerelease: false  
     draft: false
     on:
