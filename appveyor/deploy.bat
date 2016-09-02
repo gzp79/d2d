@@ -1,6 +1,3 @@
-@echo off
-set PATH=%PATH%;%QTDIR%\bin
-
 @echo setting up deploy dir
 rd /S /Q deploy
 md deploy
@@ -15,6 +12,8 @@ rem copy "%QTDIR%\bin\libwinpthread-1.dll" deploy\d2d\
 
 windeployqt --compiler-runtime --dir deploy\d2d %BUILDDIR%\d2d.exe
 
+dir deploy\
+dir deploy\d2d
 rem @echo compressing
 rem cd deploy
 rem zip -9 d2d.zip d2d\*
