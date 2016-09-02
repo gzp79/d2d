@@ -3,5 +3,5 @@ install:
   - set PATH=%PATH%;%QTDIR%\bin;C:\MinGW\bin
   
 build_script:
-  - qmake ../src/d2d.pro
+  - qmake src\d2d.pro
   - mingw32-make
