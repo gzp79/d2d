@@ -47,7 +47,7 @@ class SceneManager : public QGraphicsScene {
 public:
     enum {
         CmdInvalid,
-        CmdReset,       // don't wait for the other commands, drop everything immediatelly and clear queues
+        CmdReset,       // don't wait for the other commands, drop everything immediatelly and reset to "initial state"
         CmdClear,       // add command to the que and clear when it is processed
         CmdCache,       // save scene into a register
         CmdLine,        // add a line
@@ -89,7 +89,7 @@ public:
     protected:
         Command( int aType );
 
-        static QString toLayer( const QJsonValue& aLayer );
+        static QString toLayer( const QJsonValue& aLayer, QString aDefault = "default" );
         static QString toLayer( const QGraphicsItem* aItem );
         static int toInt( const QJsonValue& aCol, bool* ok );
         static quint32 toCol32( const QJsonValue& aCol, bool* ok );
@@ -107,12 +107,13 @@ public:
     bool    processCommands( int aTimeOut );
 
     void    saveCache( int aId ) const;
-    void    loadCache( int aId, bool aClearPrev );
+    void    loadCache( int aId, bool aReset );
     void    save( const QString& aFile ) const;
-    void    load( const QString& aFile, bool aClearPrev );
+    void    load( const QString& aFile, bool aReset );
 
-    // overriden scene functionality
+    void    reset();
     void    clear();
+    void    clear( QString aLayer );
     QRectF  itemsBoundingRect();
     void    addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerCategory aCategory );
 
@@ -120,7 +121,7 @@ public:
     void            setLayerVisibility( const QString& aName, ELayerCategory aCategory, bool aVisible );
 
     QGraphicsPointTextItem* getTextAt( const QString& aLayer, QPointF aPnt );
-    void                setSelectedAt( const QPointF& aPos );
+    void                    setSelectedAt( const QPointF& aPos );
 
 signals:
     void onAreaPolicyChanged( int aValue );
@@ -142,6 +143,8 @@ private:
         LayerCategoryMask   visibility;
 
         LayerData();
+
+        void clear();
     };
     typedef QMap<QString,LayerData>    LayerMap;
 
@@ -159,6 +162,7 @@ private:
     void        releaseQue( QList<Command*>& aQue );
     void        resetBBox();
     void        addBBox( const QPointF& aPnt );
+    void        addBBox( QGraphicsItem* aItem );
     void        updateRect();
 
     LayerData&  createLayer( const QString& aName );

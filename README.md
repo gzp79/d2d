@@ -14,20 +14,24 @@ Commands are provided as a JSon message usually
 
 ### Control Commands
 
-#### clear
+#### reset
  ```json
  { "command":"reset" }
  ```
-#### reset
+ Reset the visualizer. This command removes all the layers and graphics items and resets the tool the initial state
+#### clear
  ```json
- { "command":"clear" }
+ { "command":"clear"
+   "layer":layer }
  ```
+Clears the given __layer__. If no __layer __ is given or if it set to "*", all the layers are cleared. Note, only the items of the 
+selected layers are cleared, but the layers are kept preserving the current visibility settings.
 #### cache
  ```json
  { "command":"cache",
    "id": register }
  ```
- Store the current scene in the __register__ register. Registers are stored as persistent files in the user folder.
+ Store the current scene in the __register__. Registers are stored as persistent files in the user folder.
 
 ### Primitives
 All primitives have some common, optional properties:
@@ -124,6 +128,4 @@ For input handling there is no factory framework either, to add a new Input clas
  - add it the the Application as a member
  - initialize it in the Application::initInputs function
  - to add new commands call SceneManager::addCommand
-
-TODO: The SceneManager interface exposes too much (internal) detail for the Input Handlers. They shall only access the addCommand function. Through a simple interface it could be fixed
 

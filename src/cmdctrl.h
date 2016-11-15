@@ -29,10 +29,11 @@ public:
 
     static CommandClear* parse( const QJsonObject& aData );
 
-    CommandClear();
+    CommandClear( QString aLayer );
     virtual void execute( SceneManager& aScene ) Q_DECL_OVERRIDE;
 
-protected:    
+protected:
+    QString layer;
 };
 
 class CommandCache : public SceneManager::Command {

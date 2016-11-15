@@ -23,11 +23,12 @@ CommandReset* CommandReset::parse( const QJsonObject& aData )
 
 void CommandReset::execute( SceneManager& aScene )
 {
-    aScene.clear();
+    aScene.reset();
 }
 
-CommandClear::CommandClear()
+CommandClear::CommandClear( QString aLayer )
     : SceneManager::Command( Type )
+    , layer( aLayer )
 {
 }
 
@@ -36,12 +37,17 @@ CommandClear* CommandClear::parse( const QJsonObject& aData )
     if( aData["command"].toString() != "clear" )
         return NULL;
 
-    return new CommandClear();
+    QString layer = toLayer( aData["layer"], "*" );
+    return new CommandClear( layer );
 }
 
 void CommandClear::execute( SceneManager& aScene )
 {
-    aScene.clear();
+    qDebug() << "clear command" << layer;
+    if( layer == "*" )
+        aScene.clear();
+    else
+        aScene.clear( layer );
 }
 
 CommandCache::CommandCache()

@@ -195,7 +195,7 @@ void QGraphWidget::setBackground( int aType )
 
 void QGraphWidget::clear()
 {
-    mSceneManager->clear();
+    mSceneManager->reset();
 }
 
 void QGraphWidget::zoomIn()

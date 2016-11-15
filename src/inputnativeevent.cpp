@@ -83,7 +83,7 @@ bool InputNativeEvent::winEventFilter( const MSG* aMsg )
 
         case 2: // Clear
         {
-            mSceneManager->addCommand( new CommandClear() );
+            mSceneManager->addCommand( new CommandClear("*") );
         } break;
 
         case 4: //Line passed

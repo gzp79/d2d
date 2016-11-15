@@ -76,11 +76,11 @@ SceneManager::Command::~Command()
 {
 }
 
-QString SceneManager::Command::toLayer( const QJsonValue& aLayer )
+QString SceneManager::Command::toLayer( const QJsonValue& aLayer, QString aDefault )
 {
     QString layer = aLayer.toString();
     if( layer.isEmpty() )
-        layer = "default";
+        layer = aDefault;
 
     return layer;
 }
@@ -139,6 +139,11 @@ QColor SceneManager::Command::toQColor( quint32 aCol )
 SceneManager::LayerData::LayerData()
 {
     visibility.set();
+}
+
+void SceneManager::LayerData::clear()
+{
+    textMap.clear();
 }
 
 SceneManager::SceneManager()
@@ -292,11 +297,11 @@ void SceneManager::saveCache( int aId ) const
     QApplication::restoreOverrideCursor();
 }
 
-void SceneManager::loadCache( int aId, bool aClearPrev )
+void SceneManager::loadCache( int aId, bool aReset )
 {
     QString file = getCacheFile( aId );
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    load( file, aClearPrev );
+    load( file, aReset );
     QApplication::restoreOverrideCursor();
 }
 
@@ -342,9 +347,9 @@ void SceneManager::save( const QString& aFile ) const
     file.close();
 }
 
-void SceneManager::load( const QString& aFile, bool aClearPrev )
+void SceneManager::load( const QString& aFile, bool aReset )
 {
-    if( aClearPrev )
+    if( aReset )
         addCommand( new CommandReset() );
 
     QFile file(aFile);
@@ -359,12 +364,44 @@ void SceneManager::load( const QString& aFile, bool aClearPrev )
     addCommand( strm.readAll() );
 }
 
-void SceneManager::clear()
+void SceneManager::reset()
 {
     resetBBox();
     mLayers.clear();
     QGraphicsScene::clear();
     emit onLayersChanged();
+}
+
+void SceneManager::clear()
+{
+    resetBBox();
+    for( LayerMap::iterator it = mLayers.begin(); it != mLayers.end(); ++it )
+    {
+        it.value().clear();
+    }
+    QGraphicsScene::clear();
+}
+
+
+void SceneManager::clear( QString aLayer )
+{
+    LayerData* layer = findLayer( aLayer );
+    if( !layer )
+        return;
+
+    resetBBox();
+    layer->clear();
+    QList<QGraphicsItem*> allItems = items();
+    for( QList<QGraphicsItem*>::iterator it = allItems.begin(); it != allItems.end(); ++it )
+    {
+        QGraphicsItem* item = *it;
+        QString name = item->data( DataLayerKey ).toString();
+        if( name == aLayer )
+            removeItem( item );
+          else
+            addBBox( item );
+    }
+    updateRect();
 }
 
 QRectF SceneManager::itemsBoundingRect()
@@ -381,26 +418,22 @@ QRectF SceneManager::itemsBoundingRect()
 
 void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerCategory aCategory )
 {
-    QVariant r = aItem->data( DataBound );
-    if( r.type() == QVariant::RectF )
-    {
-        QRectF rect = r.toRectF();
-        addBBox( rect.topLeft() );
-        addBBox( rect.bottomRight() );
-    }
-    else if( r.type() == QVariant::PointF )
-    {
-        QPointF pnt = r.toPointF();
-        addBBox( pnt );
-    }
-
+    addBBox( aItem );
     aItem->setData(DataLayerKey, aLayer);
     aItem->setData(DataLayerCategory, (int)aCategory);
 
     LayerData& layer = createLayer( aLayer );
     QGraphicsPointTextItem* textItem = qgraphicsitem_cast<QGraphicsPointTextItem*>(aItem);
     if( textItem )
+    {
         layer.textMap.insert( aItem->pos(), textItem);
+        textItem->setVisible( layer.visibility[TextCategory]);
+    }
+    else
+    {
+       aItem->setVisible( layer.visibility[GeometryCategory]);
+    }
+
     QGraphicsScene::addItem( aItem );
 }
 
@@ -493,7 +526,7 @@ void SceneManager::takeCommands()
 
     if( mCommandsIn.front()->type == CmdReset )
     {
-        clear();
+        reset();
         releaseQue( mCommandProcess );
         mCommandsIn.pop_front();
         mCommandProcess.swap( mCommandsIn );
@@ -529,6 +562,24 @@ void SceneManager::addBBox( const QPointF& aPnt )
     mItemMax.rx() = qMax( aPnt.x(), mItemMax.x() );
     mItemMax.ry() = qMax( aPnt.y(), mItemMax.y() );
 }
+
+
+void SceneManager::addBBox( QGraphicsItem* aItem )
+{
+    QVariant r = aItem->data( DataBound );
+    if( r.type() == QVariant::RectF )
+    {
+        QRectF rect = r.toRectF();
+        addBBox( rect.topLeft() );
+        addBBox( rect.bottomRight() );
+    }
+    else if( r.type() == QVariant::PointF )
+    {
+        QPointF pnt = r.toPointF();
+        addBBox( pnt );
+    }
+}
+
 
 void SceneManager::updateRect()
 {   
