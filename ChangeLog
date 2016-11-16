@@ -1,17 +1,5 @@
-Change highlights in d2d-1.1.1
+Change highlights in d2d-1.0
 -------------------------------------------------------------------------------
 
-V1.1.1
-- add readme and changelog to the pre-built binary
-
-V1.1.0
-- version policy: major, minor, patch.
-- added change log
-
-V1.0.1
-- reset command resets the visualizer into the starting state
-- clear commands preserves layers and layer visibility
-- command to clear a single layer
-
-v1.0.0
+V1.0
 - first re-distributable version
