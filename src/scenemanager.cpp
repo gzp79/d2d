@@ -418,22 +418,30 @@ QRectF SceneManager::itemsBoundingRect()
 
 void SceneManager::addItem( QGraphicsItem* aItem, const QString& aLayer, ELayerCategory aCategory )
 {
+    if( aCategory < 0 || aCategory > LayerCategoryCount )
+    {
+        qWarning() << "item not added, invalid categora: "<< aCategory;
+        delete aItem;
+        return;
+    }
+
     addBBox( aItem );
     aItem->setData(DataLayerKey, aLayer);
     aItem->setData(DataLayerCategory, (int)aCategory);
 
-    LayerData& layer = createLayer( aLayer );
-    QGraphicsPointTextItem* textItem = qgraphicsitem_cast<QGraphicsPointTextItem*>(aItem);
-    if( textItem )
+    LayerData& layer = createLayer( aLayer );    
+    if( aCategory == LayerCategoryText )
     {
-        layer.textMap.insert( aItem->pos(), textItem);
-        textItem->setVisible( layer.visibility[TextCategory]);
+        QGraphicsPointTextItem* textItem = qgraphicsitem_cast<QGraphicsPointTextItem*>(aItem);
+        if( !textItem )
+        {
+            qWarning() << "item not added, invalid categora: "<< aCategory;
+            delete aItem;
+            return;
+        }
+        layer.textMap.insert( textItem->pos(), textItem );
     }
-    else
-    {
-       aItem->setVisible( layer.visibility[GeometryCategory]);
-    }
-
+    aItem->setVisible( layer.visibility[aCategory] );
     QGraphicsScene::addItem( aItem );
 }
 
