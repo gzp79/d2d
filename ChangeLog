@@ -1,5 +1,8 @@
-Change highlights in d2d-1.1.0
+Change highlights in d2d-1.1.1
 -------------------------------------------------------------------------------
+
+V1.1.1
+- add readme and changelog to the pre-built binary
 
 V1.1.0
 - version policy: major, minor, patch.

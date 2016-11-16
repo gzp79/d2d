@@ -6,6 +6,8 @@ md deploy\%DEPLOY_NAME%
 @echo deploying
 copy "%BUILDDIR%\d2d.exe" deploy\%DEPLOY_NAME%\
 copy "LICENSE" deploy\%DEPLOY_NAME%\
+copy "README.md" deploy\%DEPLOY_NAME%\
+copy "ChangeLog" deploy\%DEPLOY_NAME%\
 copy "%QTDIR%\bin\libgcc_s_dw2-1.dll" deploy\%DEPLOY_NAME%\
 copy "%QTDIR%\bin\libstdc++-6.dll" deploy\%DEPLOY_NAME%\
 copy "%QTDIR%\bin\libwinpthread-1.dll" deploy\%DEPLOY_NAME%\
