@@ -43,7 +43,6 @@ CommandClear* CommandClear::parse( const QJsonObject& aData )
 
 void CommandClear::execute( SceneManager& aScene )
 {
-    qDebug() << "clear command" << layer;
     if( layer == "*" )
         aScene.clear();
     else
